@@ -9,7 +9,7 @@ var DID = {
     RF: {
         id: 11,
         toNinja: function (value) {
-            var val = value.toString(2);
+            var val = parseInt(value).toString(2);
             while (val.length < 24) {
                 val = '0' + val;
             }
@@ -33,7 +33,10 @@ var DID = {
     }
 };
 
-function ninjaArduinoSend(did, value) {
+function ninjaArduinoSend(message) {
+    var split = message.payload.split('/');
+    var did = split[0];
+    var value = split[1];
     var deviceId = DID[did];
     if (!deviceId) {
         throw new Error('No such device id (DID): ' + did);
@@ -42,7 +45,7 @@ function ninjaArduinoSend(did, value) {
         value = deviceId.toNinja(value);
     }
     return {
-        payload: {
+        payload: JSON.stringify({
             "DEVICE": [
                 {
                     "G": "0",
@@ -51,41 +54,42 @@ function ninjaArduinoSend(did, value) {
                     "DA": value
                 }
             ]
-        }
+        }, null, 0)
     };
 }
 
-function ninjaArduinoReceive(payload) {
+function ninjaArduinoReceive(message) {
+    var payload = JSON.parse(message.payload);
     var firstDevice = payload.DEVICE[0];
-    for (var deviceString in DID) {
-        if (DID.hasOwnProperty(deviceString)) {
-            var deviceId = DID[deviceString];
-            if (deviceId.id === firstDevice.D) {
-                var value = firstDevice.DA;
-                if (deviceId.fromNinja) {
-                    value = deviceId.fromNinja(value);
-                }
-                return {
-                    payload: value
-                }
-            }
-        }
+    var key = Object.keys(DID).filter(function (key) {
+        return DID[key].id === firstDevice.D;
+    })[0];
+    if (!key) {
+        throw new Error('Unable to match DID: ' + firstDevice.D);
     }
-    throw new Error('Unable to match DID: ' + firstDevice.D);
+    var deviceId = DID[key];
+    var value = firstDevice.DA;
+    if (deviceId.fromNinja) {
+        value = deviceId.fromNinja(value);
+    }
+    return {
+        payload: value
+    }
 }
 
 
-var message = ninjaArduinoSend('RF', 0x2F1F56);
+var fromArduino = {"payload": "{\"DEVICE\":[{\"G\":\"0\",\"V\":0,\"D\":11,\"DA\":\"000011000000111100110011\"}]}"};
 
+var message = ninjaArduinoReceive(fromArduino);
 
-assert.strictEqual(message.payload.DEVICE[0].D, 11);
-assert.strictEqual(message.payload.DEVICE[0].DA, '001011110001111101010110');
+assert.strictEqual(0xc0f33, message.payload);
+console.log(message.payload.toString(16));
 
+message = ninjaArduinoSend({ payload: 'RF/0xc0f33'});
 
-message = ninjaArduinoReceive(message.payload);
+// message is  { "payload": "{\"DEVICE\":[{\"G\":\"0\",\"V\":0,\"D\":11,\"DA\":\"000011000000111100110011\"}]}" }
 
-
-assert.strictEqual(0x2F1F56, message.payload);
+assert.strictEqual(fromArduino.payload, message.payload);
 
 
 /*
