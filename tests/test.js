@@ -7,7 +7,7 @@ var ninja = require('../ninja/node-red-contrib-ninja');
 
 describe('Ninja', function () {
     describe('send', function () {
-        it('should throw an exception if the topic is a string and is not recognised', function () {
+        it('should throw an exception if the topic (DID) is a string and is not recognised', function () {
             assert.throws(function () {
                 ninja.arduinoSend({topic: 'wibble', payload: 'blah'});
             }, Error);
