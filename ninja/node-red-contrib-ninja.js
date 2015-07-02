@@ -1,20 +1,19 @@
-function arduinoSend(msg) {
-    var did = msg.topic;
-    if (typeof did === 'string') {
-        switch (did.toLowerCase()) {
-            case 'rf':
-                did = 11;
-                break;
-            case 'eyes':
-                did = 1007;
-                break;
-            case 'led':
-                did = 999;
-                break;
-            default:
-                throw new Error('Unrecognised DID symbol [' + did + '], try using the actual numeric value instead');
-        }
+function didFromString(did) {
+    switch (did.toLowerCase()) {
+        case 'rf':
+            return 11;
+        case 'eyes':
+            return 1007;
+        case 'led':
+            return 999;
+        default:
+            throw new Error('Unrecognised DID symbol [' + did + '], try using the actual numeric value instead');
     }
+}
+
+
+function arduinoSend(msg) {
+    var did = typeof msg.topic === 'string' ? didFromString(msg.topic) : msg.topic;
     var value = msg.payload;
     switch (did) {
         case 11:
