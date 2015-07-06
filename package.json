@@ -1,20 +1,30 @@
 {
-  "name": "node-red-contrib-ninja",
-  "version": "0.0.1",
-  "description": "",
-  "main": "index.js",
-  "directories": {
-    "test": "tests"
-  },
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "author": "",
-  "license": "MIT",
-  "devDependencies": {
-    "chai": "^3.0.0",
-    "gulp": "^3.9.0",
-    "gulp-load-plugins": "^0.10.0",
-    "gulp-mocha": "^2.1.2"
-  }
+    "name": "node-red-contrib-ninja",
+    "version": "0.0.1",
+    "description": "",
+    "main": "index.js",
+    "directories": {
+        "test": "tests"
+    },
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "author": "",
+    "license": "MIT",
+    "devDependencies": {
+        "chai": "^3.0.0",
+        "gulp": "^3.9.0",
+        "gulp-load-plugins": "^0.10.0",
+        "gulp-mocha": "^2.1.2"
+    },
+    "keywords": [
+        "node-red",
+        "ninja"
+    ],
+    "node-red": {
+        "nodes": {
+            "ninja-send": "ninja/ninja-send.js",
+            "ninja-receive": "ninja/ninja-receive.js"
+        }
+    }
 }
