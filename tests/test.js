@@ -24,39 +24,66 @@
 
 "use strict";
 var assert = require('chai').assert;
-var ninja = require('./node-red-contrib-ninja');
+
+
+function loadNode(config, mod) {
+    var RED = {
+        nodes: {
+            registerType: function (nodeName, nodeConfigFunc) {
+                this.nodeConfigFunc = nodeConfigFunc;
+            },
+            createNode: function () {
+            }
+        },
+        on: function (name, onFunc) {
+            this.onInput = onFunc;
+        },
+        send: function (msg) {
+            this.msg = msg;
+        },
+        error: function (error) {
+            this.nodeError = error;
+        }
+    };
+    mod(RED);
+    RED.nodes.nodeConfigFunc.call(RED, config);
+    return RED;
+}
+
+
+var ninjaSend = require('../ninja/ninja-send.js');
+
 
 describe('Ninja', function () {
     describe('send', function () {
-        it('should throw an exception if the topic (DID) is a string and is not recognised', function () {
-            assert.throws(function () {
-                ninja.arduinoSend({topic: 'wibble', payload: 'blah'});
-            }, Error);
+        it('should error if you send humidity (30)', function () {
+            var send = loadNode({}, ninjaSend);
+            send.onInput({topic: '30', payload: 'blah'});
+            assert(send.nodeError);
         });
-        it('should throw an exception if you send humidity (30)', function () {
-            assert.throws(function () {
-                ninja.arduinoSend({topic: 30, payload: 'blah'});
-            }, Error);
-        });
-        it('should throw an exception if you send temparature (31)', function () {
-            assert.throws(function () {
-                ninja.arduinoSend({topic: 31, payload: 'blah'});
-            }, Error);
+        it('should error if you send temparature (31)', function () {
+            var send = loadNode({}, ninjaSend);
+            send.onInput({topic: '31', payload: 'blah'});
+            assert(send.nodeError);
         });
         it('should build the correct JSON for RF', function () {
-            var msg = ninja.arduinoSend({topic: 'RF', payload: '0xc0f33'});
-            assert.strictEqual("{\"DEVICE\":[{\"G\":\"0\",\"V\":0,\"D\":11,\"DA\":\"000011000000111100110011\"}]}\r\n", msg);
+            var send = loadNode({}, ninjaSend);
+            send.onInput({topic: 'RF', payload: '0xc0f33'});
+            assert.isUndefined(send.nodeError);
+            assert.strictEqual("{\"DEVICE\":[{\"G\":\"0\",\"V\":0,\"D\":11,\"DA\":\"000011000000111100110011\"}]}\r\n", send.msg.payload);
         });
         it('should build the correct JSON for 11', function () {
-            var msg = ninja.arduinoSend({topic: 11, payload: '0xc0f33'});
-            assert.strictEqual("{\"DEVICE\":[{\"G\":\"0\",\"V\":0,\"D\":11,\"DA\":\"000011000000111100110011\"}]}\r\n", msg);
+            var send = loadNode({d: '11', da: '0xc0f33'}, ninjaSend);
+            send.onInput({});
+            assert.isUndefined(send.nodeError);
+            assert.strictEqual("{\"DEVICE\":[{\"G\":\"0\",\"V\":0,\"D\":11,\"DA\":\"000011000000111100110011\"}]}\r\n", send.msg.payload);
         });
     });
-    describe('receive', function () {
-        it('should parse real JSON', function () {
-            var msg = ninja.arduinoReceive({payload: "{\"DEVICE\":[{\"G\":\"0\",\"V\":0,\"D\":11,\"DA\":\"000011000000111100110011\"}]}\r\n"});
-            assert.strictEqual(11, msg.topic);
-            assert.strictEqual('0c0f33', msg.payload);
-        });
-    });
+    //describe('receive', function () {
+    //    it('should parse real JSON', function () {
+    //        var msg = ninja.arduinoReceive({payload: "{\"DEVICE\":[{\"G\":\"0\",\"V\":0,\"D\":11,\"DA\":\"000011000000111100110011\"}]}\r\n"});
+    //        assert.strictEqual(11, msg.topic);
+    //        assert.strictEqual('0c0f33', msg.payload);
+    //    });
+    //});
 });
