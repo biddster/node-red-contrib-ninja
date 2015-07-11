@@ -52,23 +52,24 @@ function loadNode(config, mod) {
 
 
 var ninjaSend = require('../ninja/ninja-send.js');
+var ninjaReceive = require('../ninja/ninja-receive.js');
 
 
 describe('Ninja', function () {
     describe('send', function () {
         it('should error if you send humidity (30)', function () {
-            var send = loadNode({}, ninjaSend);
-            send.onInput({topic: '30', payload: 'blah'});
+            var send = loadNode({d: '30', da: 'blah'}, ninjaSend);
+            send.onInput({});
             assert(send.nodeError);
         });
         it('should error if you send temparature (31)', function () {
-            var send = loadNode({}, ninjaSend);
-            send.onInput({topic: '31', payload: 'blah'});
+            var send = loadNode({d: '31', da: 'blah'}, ninjaSend);
+            send.onInput({});
             assert(send.nodeError);
         });
         it('should build the correct JSON for RF', function () {
-            var send = loadNode({}, ninjaSend);
-            send.onInput({topic: 'RF', payload: '0xc0f33'});
+            var send = loadNode({d: 'RF', da: '0xc0f33'}, ninjaSend);
+            send.onInput({});
             assert.isUndefined(send.nodeError);
             assert.strictEqual("{\"DEVICE\":[{\"G\":\"0\",\"V\":0,\"D\":11,\"DA\":\"000011000000111100110011\"}]}\r\n", send.msg.payload);
         });
@@ -79,11 +80,13 @@ describe('Ninja', function () {
             assert.strictEqual("{\"DEVICE\":[{\"G\":\"0\",\"V\":0,\"D\":11,\"DA\":\"000011000000111100110011\"}]}\r\n", send.msg.payload);
         });
     });
-    //describe('receive', function () {
-    //    it('should parse real JSON', function () {
-    //        var msg = ninja.arduinoReceive({payload: "{\"DEVICE\":[{\"G\":\"0\",\"V\":0,\"D\":11,\"DA\":\"000011000000111100110011\"}]}\r\n"});
-    //        assert.strictEqual(11, msg.topic);
-    //        assert.strictEqual('0c0f33', msg.payload);
-    //    });
-    //});
+    describe('receive', function () {
+        it('should parse real JSON', function () {
+            var receive = loadNode({}, ninjaReceive);
+            receive.onInput({payload: "{\"DEVICE\":[{\"G\":\"0\",\"V\":0,\"D\":11,\"DA\":\"000011000000111100110011\"}]}\r\n"});
+            assert.isUndefined(receive.nodeError);
+            assert.strictEqual(11, receive.msg.topic);
+            assert.strictEqual('0c0f33', receive.msg.payload);
+        });
+    });
 });

@@ -25,6 +25,23 @@
 module.exports = function (RED) {
     'use strict';
 
+    RED.nodes.registerType("ninja-send", function (config) {
+        RED.nodes.createNode(this, config);
+        var node = this;
+        node.d = config.d;
+        node.da = config.da;
+        node.on('input', function (msg) {
+            try {
+                var d = prepareD(msg.topic || node.d);
+                var da = prepareDA(d, msg.payload || node.da);
+                msg.payload = JSON.stringify({"DEVICE": [{"G": "0", "V": 0, "D": d, "DA": da}]}, null, 0) + '\r\n';
+                node.send(msg);
+            } catch (error) {
+                node.error(error.message, msg);
+            }
+        });
+    });
+
     function prepareD(did) {
         switch (did.toLowerCase()) {
             case 'rf':
@@ -55,24 +72,4 @@ module.exports = function (RED) {
         }
         return value;
     }
-
-    function NinjaSend(config) {
-        RED.nodes.createNode(this, config);
-        var node = this;
-        this.d = config.d;
-        this.da = config.da;
-        this.on('input', function (msg) {
-            try {
-                var d = prepareD(msg.topic || node.d);
-                var da = prepareDA(d, msg.payload || node.da);
-                msg.payload = JSON.stringify({"DEVICE": [{"G": "0", "V": 0, "D": d, "DA": da}]}, null, 0) + '\r\n';
-                node.send(msg);
-            } catch (error) {
-                console.log(error.stack);
-                node.error(error.message, msg);
-            }
-        });
-    }
-
-    RED.nodes.registerType("ninja-send", NinjaSend);
 };

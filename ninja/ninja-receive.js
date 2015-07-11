@@ -25,10 +25,10 @@
 module.exports = function (RED) {
     'use strict';
 
-    function NinjaReceive(config) {
+    RED.nodes.registerType("ninja-receive", function (config) {
         RED.nodes.createNode(this, config);
         var node = this;
-        this.on('input', function (msg) {
+        node.on('input', function (msg) {
             var payload = JSON.parse(msg.payload);
             var firstDevice = payload.DEVICE[0];
             var value = firstDevice.DA;
@@ -50,7 +50,5 @@ module.exports = function (RED) {
             msg.payload = value;
             node.send(msg);
         });
-    }
-
-    RED.nodes.registerType("ninja-receive", NinjaReceive);
+    });
 };
