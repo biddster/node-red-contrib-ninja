@@ -32,10 +32,8 @@ THE SOFTWARE.
         },
         inputs: 1,
         outputs: 1,
-        icon: "file.png",
-        label: function () {
-            return this.name || "ninja-send";
-        }
+        icon: "ninja.png",
+        label: "Ninja Send"
     });
 </script>
 
@@ -45,11 +43,11 @@ THE SOFTWARE.
         <input type="text" id="node-input-d" placeholder="(D)">
     </div>
     <div class="form-row">
-        <label for="node-input-da"><i class="icon-tag"></i> What is DA? (DA)</label>
-        <input type="text" id="node-input-value" placeholder="(DA)">
+        <label for="node-input-da"><i class="icon-tag"></i> The value to send to the Ninja (DA)</label>
+        <input type="text" id="node-input-da" placeholder="(DA)">
     </div>
 </script>
 
 <script type="text/x-red" data-help-name="ninja-send">
-    <p>A Ninja Block node that prepares a payload which can be send by a downstream serial node.</p>
+    <p>A Ninja Block node that prepares a payload which can be sent by a downstream serial node.</p>
 </script>

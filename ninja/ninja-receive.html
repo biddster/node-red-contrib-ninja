@@ -29,10 +29,8 @@ THE SOFTWARE.
         defaults: {},
         inputs: 1,
         outputs: 1,
-        icon: "file.png",
-        label: function () {
-            return this.name || "ninja-receive";
-        }
+        icon: "ninja.png",
+        label: "Ninja Receive"
     });
 </script>
 
@@ -41,5 +39,6 @@ THE SOFTWARE.
 </script>
 
 <script type="text/x-red" data-help-name="ninja-receive">
-    <p>A Ninja Block node that prepares a payload which can be send by a downstream serial node.</p>
+    <p>A Ninja Block node that parses a response from a Ninja Block.</p>
+
 </script>
