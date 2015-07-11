@@ -26,19 +26,16 @@ module.exports = function (RED) {
     'use strict';
 
     function prepareD(did) {
-        if (typeof did === 'string') {
-            switch (did.toLowerCase()) {
-                case 'rf':
-                    return 11;
-                case 'eyes':
-                    return 1007;
-                case 'led':
-                    return 999;
-                default:
-                    throw new Error('Unrecognised DID symbol [' + did + '], try using the actual numeric value instead');
-            }
+        switch (did.toLowerCase()) {
+            case 'rf':
+                return 11;
+            case 'eyes':
+                return 1007;
+            case 'led':
+                return 999;
+            default:
+                return parseInt(did);
         }
-        return did;
     }
 
     function prepareDA(did, value) {
@@ -66,12 +63,12 @@ module.exports = function (RED) {
         this.da = config.da;
         this.on('input', function (msg) {
             try {
-                // TODO - the preparation of these two could be at config time? How do errors work there? The same?
-                var d = prepareD(node.d);
-                var da = prepareDA(d, node.da);
+                var d = prepareD(msg.topic || node.d);
+                var da = prepareDA(d, msg.payload || node.da);
                 msg.payload = JSON.stringify({"DEVICE": [{"G": "0", "V": 0, "D": d, "DA": da}]}, null, 0) + '\r\n';
                 node.send(msg);
             } catch (error) {
+                console.log(error.stack);
                 node.error(error.message, msg);
             }
         });
