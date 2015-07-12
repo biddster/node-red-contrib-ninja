@@ -49,5 +49,9 @@ THE SOFTWARE.
 </script>
 
 <script type="text/x-red" data-help-name="ninja-send">
-    <p>A Ninja Block node that prepares a payload which can be sent by a downstream serial node.</p>
+    <p>This node's property values are not mandatory. You have the choice to configure this node statically by entering property values
+         or to inject values dynamically into this node from an upstream node. If you choose to inject values from upstream,
+         the value for device ID (D) is taken from msg.topic and the value of DA is taken from msg.payload.
+         In either case, this node will send a downstream msg where msg.payload is the appropriately formatted JSON suitable for the Ninja Block.
+    </p>
 </script>
