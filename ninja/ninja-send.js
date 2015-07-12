@@ -26,6 +26,7 @@ module.exports = function (RED) {
     'use strict';
 
     RED.nodes.registerType("ninja-send", function (config) {
+        this.log('Ninja send create node - d [' + JSON.stringify(config, null, 4) + ']\n');
         RED.nodes.createNode(this, config);
         var node = this;
         node.d = config.d;
@@ -34,6 +35,7 @@ module.exports = function (RED) {
             try {
                 var d = prepareD(msg.topic || node.d);
                 var da = prepareDA(d, msg.payload || node.da);
+                node.log('Sending - d [' + node.d + '] da [' + node.da + '] topic [' + msg.topic + '] payload [' + msg.payload + ']\n');
                 msg.payload = JSON.stringify({"DEVICE": [{"G": "0", "V": 0, "D": d, "DA": da}]}, null, 0) + '\r\n';
                 node.send(msg);
             } catch (error) {

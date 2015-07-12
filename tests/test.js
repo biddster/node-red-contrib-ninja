@@ -43,6 +43,9 @@ function loadNode(config, mod) {
         },
         error: function (error) {
             this.nodeError = error;
+        },
+        log: function () {
+            console.log.apply(this, arguments);
         }
     };
     mod(RED);
