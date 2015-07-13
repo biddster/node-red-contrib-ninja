@@ -37,9 +37,9 @@ module.exports = function (RED) {
                 var d = msg.topic || node.d;
                 var da = msg.payload || node.da;
                 if (!d) {
-                    nodeError(node, 'No d value', msg);
+                    nodeError(node, 'No D value', msg);
                 } else if (!da) {
-                    nodeError(node, 'No da value', msg);
+                    nodeError(node, 'No DA value', msg);
                 } else {
                     d = prepareD(d);
                     da = prepareDA(d, da);
