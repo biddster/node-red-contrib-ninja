@@ -37,20 +37,26 @@ module.exports = function (RED) {
                 var d = msg.topic || node.d;
                 var da = msg.payload || node.da;
                 if (!d) {
-                    node.error('No d value', msg);
+                    nodeError(node, 'No d value', msg);
                 } else if (!da) {
-                    node.error('No da value', msg);
+                    nodeError(node, 'No da value', msg);
                 } else {
                     d = prepareD(d);
                     da = prepareDA(d, da);
                     msg.payload = JSON.stringify({"DEVICE": [{"G": "0", "V": 0, "D": d, "DA": da}]}, null, 0) + '\r\n';
                     node.send(msg);
+                    node.status({fill: "green", shape: "dot", text: "OK"});
                 }
             } catch (error) {
-                node.error(error.message, msg);
+                nodeError(node, error.message, msg);
             }
         });
     });
+
+    function nodeError(node, errorMessage, msg) {
+        node.error(errorMessage, msg);
+        node.status({fill: "red", shape: "dot", text: errorMessage});
+    }
 
     function prepareD(did) {
         switch (did.toLowerCase()) {

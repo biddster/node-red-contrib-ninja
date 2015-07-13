@@ -46,12 +46,14 @@ THE SOFTWARE.
         <label for="node-input-da"><i class="icon-tag"></i> The value to send to the Ninja (DA)</label>
         <input type="text" id="node-input-da" placeholder="(DA)">
     </div>
+
 </script>
 
 <script type="text/x-red" data-help-name="ninja-send">
     <p>This node's property values are not mandatory. You have the choice to configure this node statically by entering property values
          or to inject values dynamically into this node from an upstream node. If you choose to inject values from upstream,
          the value for device ID (D) is taken from msg.topic and the value of DA is taken from msg.payload.
-         In either case, this node will send a downstream msg where msg.payload is the appropriately formatted JSON suitable for the Ninja Block.
     </p>
+    <p>Note that values supplied from upstream via msg will override any property values set in the node editor.</p>
+    <p>In either case, this node will send a downstream msg where msg.payload is the appropriately formatted JSON suitable for the Ninja Block. </p>
 </script>

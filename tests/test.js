@@ -44,6 +44,9 @@ function loadNode(config, mod) {
         error: function (error) {
             this.nodeError = error;
         },
+        status: function (status) {
+            this.nodeStatus = status;
+        },
         log: function () {
             console.log.apply(this, arguments);
         }
@@ -64,23 +67,27 @@ describe('Ninja', function () {
             var send = loadNode({d: '30', da: 'blah'}, ninjaSend);
             send.onInput({});
             assert(send.nodeError);
+            assert.strictEqual('red', send.nodeStatus.fill);
         });
         it('should error if you send temparature (31)', function () {
             var send = loadNode({d: '31', da: 'blah'}, ninjaSend);
             send.onInput({});
             assert(send.nodeError);
+            assert.strictEqual('red', send.nodeStatus.fill);
         });
         it('should build the correct JSON for RF', function () {
             var send = loadNode({d: 'RF', da: '0xc0f33'}, ninjaSend);
             send.onInput({});
             assert.isUndefined(send.nodeError);
+            assert.strictEqual('green', send.nodeStatus.fill);
             assert.strictEqual("{\"DEVICE\":[{\"G\":\"0\",\"V\":0,\"D\":11,\"DA\":\"000011000000111100110011\"}]}\r\n", send.msg.payload);
         });
         it('should build the correct JSON for 11', function () {
-            var send = loadNode({d: '11', da: '0xc0f33'}, ninjaSend);
+            var send = loadNode({d: '11', da: '0x155157'}, ninjaSend);
             send.onInput({});
             assert.isUndefined(send.nodeError);
-            assert.strictEqual("{\"DEVICE\":[{\"G\":\"0\",\"V\":0,\"D\":11,\"DA\":\"000011000000111100110011\"}]}\r\n", send.msg.payload);
+            assert.strictEqual('green', send.nodeStatus.fill);
+            assert.strictEqual("{\"DEVICE\":[{\"G\":\"0\",\"V\":0,\"D\":11,\"DA\":\"000101010101000101010111\"}]}\r\n", send.msg.payload);
         });
     });
     describe('receive', function () {
