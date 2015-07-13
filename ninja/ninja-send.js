@@ -33,11 +33,19 @@ module.exports = function (RED) {
         node.da = config.da;
         node.on('input', function (msg) {
             try {
-                var d = prepareD(msg.topic || node.d);
-                var da = prepareDA(d, msg.payload || node.da);
                 node.log('Sending - d [' + node.d + '] da [' + node.da + '] topic [' + msg.topic + '] payload [' + msg.payload + ']\n');
-                msg.payload = JSON.stringify({"DEVICE": [{"G": "0", "V": 0, "D": d, "DA": da}]}, null, 0) + '\r\n';
-                node.send(msg);
+                var d = msg.topic || node.d;
+                var da = msg.payload || node.da;
+                if (!d) {
+                    node.error('No d value', msg);
+                } else if (!da) {
+                    node.error('No da value', msg);
+                } else {
+                    d = prepareD(d);
+                    da = prepareDA(d, da);
+                    msg.payload = JSON.stringify({"DEVICE": [{"G": "0", "V": 0, "D": d, "DA": da}]}, null, 0) + '\r\n';
+                    node.send(msg);
+                }
             } catch (error) {
                 node.error(error.message, msg);
             }
@@ -68,7 +76,7 @@ module.exports = function (RED) {
             case 30:
                 throw new Error('Cannot make a send request for Humidity');
             case 31:
-                throw new Error('Cannot make a send request for Temparature');
+                throw new Error('Cannot make a send request for Temperature');
             default:
                 break;
         }
