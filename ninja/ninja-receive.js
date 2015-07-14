@@ -32,7 +32,7 @@ module.exports = function (RED) {
             try {
                 var payload = JSON.parse(msg.payload);
                 node.log(payload);
-                if (payload.hasOwnProperty('ERROR')) {
+                if (payload.ERROR) {
                     var error = 'Error code: ' + payload.ERROR[0].CODE;
                     node.error(error, msg);
                     node.status({fill: "red", shape: "dot", text: error});
