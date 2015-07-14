@@ -29,26 +29,40 @@ module.exports = function (RED) {
         RED.nodes.createNode(this, config);
         var node = this;
         node.on('input', function (msg) {
-            var payload = JSON.parse(msg.payload);
-            var firstDevice = payload.DEVICE[0];
-            var value = firstDevice.DA;
-            switch (firstDevice.D) {
-                case 11:
-                    value = parseInt(value, 2).toString(16);
-                    while (value.length < 6) {
-                        value = '0' + value;
+            try {
+                var payload = JSON.parse(msg.payload);
+                node.log(payload);
+                if (payload.hasOwnProperty('ERROR')) {
+                    var error = 'Error code: ' + payload.ERROR[0].CODE;
+                    node.error(error, msg);
+                    node.status({fill: "red", shape: "dot", text: error});
+                } else {
+                    var firstDevice = payload.DEVICE[0];
+                    var value = firstDevice.DA;
+                    switch (firstDevice.D) {
+                        case 11:
+                            value = parseInt(value, 2).toString(16);
+                            while (value.length < 6) {
+                                value = '0' + value;
+                            }
+                            break;
+                        case 30:
+                        case 31:
+                            value = parseInt(value);
+                            break;
+                        default:
+                            break;
                     }
-                    break;
-                case 30:
-                case 31:
-                    value = parseInt(value);
-                    break;
-                default:
-                    break;
+                    msg.topic = firstDevice.D;
+                    msg.payload = value;
+                    node.send(msg);
+                    node.status({fill: "green", shape: "dot", text: "OK"});
+                }
+            } catch (error) {
+                node.log(error.stack);
+                node.error(error, msg);
+                node.status({fill: "red", shape: "dot", text: error.message});
             }
-            msg.topic = firstDevice.D;
-            msg.payload = value;
-            node.send(msg);
         });
     });
 };

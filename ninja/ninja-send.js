@@ -48,6 +48,7 @@ module.exports = function (RED) {
                     node.status({fill: "green", shape: "dot", text: "OK"});
                 }
             } catch (error) {
+                node.log(error.stack);
                 nodeError(node, error.message, msg);
             }
         });

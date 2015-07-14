@@ -98,5 +98,11 @@ describe('Ninja', function () {
             assert.strictEqual(11, receive.msg.topic);
             assert.strictEqual('0c0f33', receive.msg.payload);
         });
+        it('should handle an ERROR', function () {
+            var receive = loadNode({}, ninjaReceive);
+            receive.onInput({payload: "{\"ERROR\":[{\"CODE\":1}]}\r\n"});
+            assert(receive.nodeError);
+            assert.strictEqual('red', receive.nodeStatus.fill);
+        });
     });
 });
