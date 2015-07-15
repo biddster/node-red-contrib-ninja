@@ -26,7 +26,6 @@ module.exports = function (RED) {
     'use strict';
 
     RED.nodes.registerType("ninja-send", function (config) {
-        this.log('Ninja send create node - d [' + JSON.stringify(config, null, 4) + ']\n');
         RED.nodes.createNode(this, config);
         var node = this;
         node.d = config.d;
