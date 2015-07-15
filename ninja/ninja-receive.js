@@ -30,34 +30,26 @@ module.exports = function (RED) {
         var node = this;
         node.on('input', function (msg) {
             try {
-                var payload = JSON.parse(msg.payload);
-                node.log(payload);
-                if (payload.ERROR) {
-                    var error = 'Error code: ' + payload.ERROR[0].CODE;
-                    node.error(error, msg);
-                    node.status({fill: "red", shape: "dot", text: error});
-                } else {
-                    var firstDevice = payload.DEVICE[0];
-                    var value = firstDevice.DA;
-                    switch (firstDevice.D) {
-                        case 11:
-                            value = parseInt(value, 2).toString(16);
-                            while (value.length < 6) {
-                                value = '0' + value;
-                            }
-                            break;
-                        case 30:
-                        case 31:
-                            value = parseInt(value);
-                            break;
-                        default:
-                            break;
-                    }
-                    msg.topic = firstDevice.D;
-                    msg.payload = value;
-                    node.send(msg);
-                    node.status({fill: "green", shape: "dot", text: "OK"});
+                var device = parseDevice(msg);
+                var value = device.DA;
+                switch (device.D) {
+                    case 11:
+                        value = parseInt(value, 2).toString(16);
+                        while (value.length < 6) {
+                            value = '0' + value;
+                        }
+                        break;
+                    case 30:
+                    case 31:
+                        value = parseInt(value);
+                        break;
+                    default:
+                        break;
                 }
+                msg.topic = device.D;
+                msg.payload = value;
+                node.send(msg);
+                node.status({fill: "green", shape: "dot", text: "OK"});
             } catch (error) {
                 node.log(error.stack);
                 node.error(error, msg);
@@ -65,4 +57,23 @@ module.exports = function (RED) {
             }
         });
     });
+
+
+    function parseDevice(msg) {
+        // We have to do some repairs to msg.payload as the Ninja sometimes sends a response like this:
+        //     ""{\"ERROR\":[{\"CODE\":2}]}\r\n""
+        // For JSON.parse we have to strip leading and trailing " and unescape the \".
+        // TODO - can we do this easier using regex?
+        var payload = msg.payload.replace(/\\"/g, '"');
+        var start = 0, end = payload.length - 1;
+        while (payload.charAt(start) !== '{') start++;
+        while (payload.charAt(end) != '}') end--;
+        payload = payload.substring(start, end + 1);
+
+        var obj = JSON.parse(payload);
+        if (obj.ERROR) {
+            throw new Error('Error code: ' + obj.ERROR[0].CODE);
+        }
+        return obj.DEVICE[0];
+    }
 };

@@ -100,8 +100,9 @@ describe('Ninja', function () {
         });
         it('should handle an ERROR', function () {
             var receive = loadNode({}, ninjaReceive);
-            receive.onInput({payload: "{\"ERROR\":[{\"CODE\":1}]}\r\n"});
+            receive.onInput({payload: '"{\\\"ERROR\\\":[{\\\"CODE\\\":2}]}\r\n"'});
             assert(receive.nodeError);
+            assert.strictEqual('Error code: 2', receive.nodeError.message);
             assert.strictEqual('red', receive.nodeStatus.fill);
         });
     });
