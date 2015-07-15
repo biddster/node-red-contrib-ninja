@@ -75,12 +75,39 @@ describe('Ninja', function () {
             assert(send.nodeError);
             assert.strictEqual('red', send.nodeStatus.fill);
         });
+        it('should error if D is missing', function () {
+            var send = loadNode({}, ninjaSend);
+            send.onInput({});
+            assert(send.nodeError);
+            assert.strictEqual('No D value', send.nodeError.message);
+            assert.strictEqual('red', send.nodeStatus.fill);
+        });
+        it('should error if DA is missing', function () {
+            var send = loadNode({d: 'RF'}, ninjaSend);
+            send.onInput({});
+            assert(send.nodeError);
+            assert.strictEqual('No DA value', send.nodeError.message);
+            assert.strictEqual('red', send.nodeStatus.fill);
+        });
         it('should build the correct JSON for RF', function () {
             var send = loadNode({d: 'RF', da: '0xc0f33'}, ninjaSend);
             send.onInput({});
             assert.isUndefined(send.nodeError);
             assert.strictEqual('green', send.nodeStatus.fill);
             assert.strictEqual("{\"DEVICE\":[{\"G\":\"0\",\"V\":0,\"D\":11,\"DA\":\"000011000000111100110011\"}]}\r\n", send.msg.payload);
+        });
+        it('should override the static config is msg.topic and msg.payload are supplied.', function () {
+            var send = loadNode({d: 'RF', da: '0xc0f33'}, ninjaSend);
+            send.onInput({});
+            assert.isUndefined(send.nodeError);
+            assert.strictEqual('green', send.nodeStatus.fill);
+            assert.strictEqual("{\"DEVICE\":[{\"G\":\"0\",\"V\":0,\"D\":11,\"DA\":\"000011000000111100110011\"}]}\r\n", send.msg.payload);
+
+            // Now override the config with a msg.topic and payload.
+            send.onInput({topic: 'EYES', payload: 'green'});
+            assert.isUndefined(send.nodeError);
+            assert.strictEqual('green', send.nodeStatus.fill);
+            assert.strictEqual("{\"DEVICE\":[{\"G\":\"0\",\"V\":0,\"D\":1007,\"DA\":\"green\"}]}\r\n", send.msg.payload);
         });
         it('should build the correct JSON for 11', function () {
             var send = loadNode({d: '11', da: '0x155157'}, ninjaSend);
