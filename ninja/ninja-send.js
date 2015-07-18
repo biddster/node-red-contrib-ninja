@@ -62,11 +62,11 @@ module.exports = function (RED) {
         }
     }
 
-    function prepareDA(did, da) {
+    function prepareDA(d, da) {
         if (!da) {
             throw new Error('No DA value');
         }
-        switch (did) {
+        switch (d) {
             case 11:
                 da = parseInt(da).toString(2);
                 while (da.length < 24) {
