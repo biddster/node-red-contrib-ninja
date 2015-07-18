@@ -32,19 +32,13 @@ module.exports = function (RED) {
             try {
                 var device = parseDevice(msg);
                 var value = device.DA;
-                switch (device.D) {
-                    case 11:
-                        value = parseInt(value, 2).toString(16);
-                        while (value.length < 6) {
-                            value = '0' + value;
-                        }
-                        break;
-                    case 30:
-                    case 31:
-                        value = parseInt(value);
-                        break;
-                    default:
-                        break;
+                if (device.D === 11) {
+                    // RF (11) values come back as base 2 e.g. 000011000000111100110011
+                    value = parseInt(value, 2).toString(16);
+                    // Dad, remind me why we pad to 6 chars?
+                    while (value.length < 6) {
+                        value = '0' + value;
+                    }
                 }
                 msg.topic = device.D;
                 msg.payload = value;
@@ -62,7 +56,7 @@ module.exports = function (RED) {
     function parseDevice(msg) {
         // We have to do some repairs to msg.payload as the Ninja sometimes sends a response like this:
         //     ""{\"ERROR\":[{\"CODE\":2}]}\r\n""
-        // For JSON.parse we have to strip leading and trailing " and unescape the \".
+        // For JSON.parse we have to strip leading and trailing ", remove \r\n and unescape the \".
         // TODO - can we do this easier using regex?
         var payload = msg.payload.replace(/\\"/g, '"');
         var start = 0, end = payload.length - 1;

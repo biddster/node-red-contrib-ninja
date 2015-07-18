@@ -132,5 +132,12 @@ describe('Ninja', function () {
             assert.strictEqual('Error code: 2', receive.nodeError.message);
             assert.strictEqual('red', receive.nodeStatus.fill);
         });
+        it('should parse temp as a floating point', function () {
+            var receive = loadNode({}, ninjaReceive);
+            receive.onInput({payload: '"{\"DEVICE\":[{\"G\":\"0101\",\"V\":0,\"D\":31,\"DA\":23.80000}]}\r\n"'});
+            assert.isUndefined(receive.nodeError);
+            assert.strictEqual(31, receive.msg.topic);
+            assert.strictEqual(23.80000, receive.msg.payload);
+        });
     });
 });
