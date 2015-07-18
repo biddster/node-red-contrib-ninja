@@ -24,6 +24,7 @@
 
 module.exports = function (RED) {
     'use strict';
+    var _ = require('lodash-node');
 
     RED.nodes.registerType("ninja-receive", function (config) {
         RED.nodes.createNode(this, config);
@@ -63,7 +64,7 @@ module.exports = function (RED) {
 
         var obj = JSON.parse(payload);
         if (obj.ERROR) {
-            throw new Error('Error code: ' + obj.ERROR[0].CODE);
+            throw new Error('Error code: ' + _.pluck(obj.ERROR, 'CODE').join(','));
         }
         return obj.DEVICE[0];
     }

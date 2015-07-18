@@ -28,5 +28,8 @@
       "ninja-send": "ninja/ninja-send.js",
       "ninja-receive": "ninja/ninja-receive.js"
     }
+  },
+  "dependencies": {
+    "lodash-node": "^3.10.0"
   }
 }

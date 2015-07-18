@@ -132,6 +132,13 @@ describe('Ninja', function () {
             assert.strictEqual(receive.nodeError.message, 'Error code: 2');
             assert.strictEqual(receive.nodeStatus.fill, 'red');
         });
+        it('should handle multiple ERRORs', function () {
+            var receive = loadNode({}, ninjaReceive);
+            receive.onInput({payload: '"{\\\"ERROR\\\":[{\\\"CODE\\\":1},{\\\"CODE\\\":2},{\\\"CODE\\\":3}]}\r\n"'});
+            assert(receive.nodeError);
+            assert.strictEqual(receive.nodeError.message, 'Error code: 1,2,3');
+            assert.strictEqual(receive.nodeStatus.fill, 'red');
+        });
         it('should parse temp as a floating point', function () {
             var receive = loadNode({}, ninjaReceive);
             receive.onInput({payload: '"{\"DEVICE\":[{\"G\":\"0101\",\"V\":0,\"D\":31,\"DA\":23.80000}]}\r\n"'});
