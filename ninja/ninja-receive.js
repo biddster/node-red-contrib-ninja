@@ -35,10 +35,7 @@ module.exports = function (RED) {
                 if (device.D === 11) {
                     // RF (11) values come back as base 2 e.g. 000011000000111100110011
                     value = parseInt(value, 2).toString(16);
-                    // Dad, remind me why we pad to 6 chars?
-                    while (value.length < 6) {
-                        value = '0' + value;
-                    }
+                    value = '0x' + value;
                 }
                 msg.topic = device.D;
                 msg.payload = value;
