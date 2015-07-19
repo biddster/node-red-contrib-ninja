@@ -31,16 +31,21 @@ module.exports = function (RED) {
         var node = this;
         node.on('input', function (msg) {
             try {
-                var device = parseDevice(msg);
-                var value = device.DA;
-                if (device.D === 11) {
-                    // RF (11) values come back as base 2 e.g. 000011000000111100110011
-                    value = parseInt(value, 2).toString(16);
-                    value = '0x' + value;
-                }
-                msg.topic = device.D;
-                msg.payload = value;
-                node.send(msg);
+                var msgs = [];
+                parseDevices(msg).forEach(function (device) {
+                    var value = device.DA;
+                    if (device.D === 11) {
+                        // RF (11) values come back as base 2 e.g. 000011000000111100110011
+                        value = parseInt(value, 2).toString(16);
+                        value = '0x' + value;
+                    }
+                    msgs.push({
+                        topic: device.D,
+                        payload: value,
+                        G: device.G
+                    });
+                });
+                node.send(msgs.length === 1 ? msgs[0] : msgs);
                 node.status({fill: "green", shape: "dot", text: "OK"});
             } catch (error) {
                 node.log(error.stack);
@@ -51,7 +56,7 @@ module.exports = function (RED) {
     });
 
 
-    function parseDevice(msg) {
+    function parseDevices(msg) {
         // We have to do some repairs to msg.payload as the Ninja sometimes sends a response like this:
         //     ""{\"ERROR\":[{\"CODE\":2}]}\r\n""
         // For JSON.parse we have to strip leading and trailing ", remove \r\n and unescape the \".
@@ -63,9 +68,11 @@ module.exports = function (RED) {
         payload = payload.substring(start, end + 1);
 
         var obj = JSON.parse(payload);
-        if (obj.ERROR) {
+        if (_.isString(obj)) {
+            throw new Error('Ninja response parse error. Please report on GitHub along with the payload.');
+        } else if (obj.ERROR) {
             throw new Error('Error code: ' + _.pluck(obj.ERROR, 'CODE').join(','));
         }
-        return obj.DEVICE[0];
+        return obj.DEVICE;
     }
 };

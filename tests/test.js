@@ -24,7 +24,7 @@
 
 "use strict";
 var assert = require('chai').assert;
-
+var _ = require('lodash-node');
 
 function loadNode(config, mod) {
     var RED = {
@@ -145,6 +145,17 @@ describe('Ninja', function () {
             assert.isUndefined(receive.nodeError);
             assert.strictEqual(receive.msg.topic, 31);
             assert.strictEqual(receive.msg.payload, 23.80000);
+        });
+        it('should handle multiple devices', function () {
+            var receive = loadNode({}, ninjaReceive);
+            receive.onInput({payload: '"{\"DEVICE\":[{\"G\":\"0101\",\"V\":0,\"D\":31,\"DA\":23.80000},{\"G\":\"0102\",\"V\":0,\"D\":31,\"DA\":22.50000}]}\r\n"'});
+            assert.isUndefined(receive.nodeError);
+            assert(_.isArray(receive.msg));
+            assert.strictEqual(receive.msg.length, 2);
+            assert.strictEqual(receive.msg[0].topic, 31);
+            assert.strictEqual(receive.msg[0].payload, 23.80000);
+            assert.strictEqual(receive.msg[1].topic, 31);
+            assert.strictEqual(receive.msg[1].payload, 22.50000);
         });
     });
 });
