@@ -33,15 +33,15 @@ module.exports = function (RED) {
             try {
                 var msgs = [];
                 parseDevices(msg).forEach(function (device) {
-                    var value = device.DA;
+                    var da = device.DA;
                     if (device.D === 11) {
                         // RF (11) values come back as base 2 e.g. 000011000000111100110011
-                        value = parseInt(value, 2).toString(16);
-                        value = '0x' + value;
+                        da = parseInt(da, 2).toString(16);
+                        da = '0x' + da;
                     }
                     msgs.push({
                         topic: device.D,
-                        payload: value,
+                        payload: da,
                         G: device.G
                     });
                 });
