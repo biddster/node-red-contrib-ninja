@@ -31,21 +31,15 @@ module.exports = function (RED) {
         var node = this;
         node.on('input', function (msg) {
             try {
-                var msgs = [];
                 parseDevices(msg).forEach(function (device) {
-                    var da = device.DA;
                     if (device.D === 11) {
                         // RF (11) values come back as base 2 e.g. 000011000000111100110011
-                        da = parseInt(da, 2).toString(16);
-                        da = '0x' + da;
+                        device.DA = '0x' + parseInt(device.DA, 2).toString(16);
                     }
-                    msgs.push({
-                        topic: device.D,
-                        payload: da,
-                        G: device.G
+                    node.send({
+                        payload: device
                     });
                 });
-                node.send(msgs.length === 1 ? msgs[0] : msgs);
                 node.status({fill: "green", shape: "dot", text: "OK"});
             } catch (error) {
                 node.log(error.stack);
@@ -54,7 +48,6 @@ module.exports = function (RED) {
             }
         });
     });
-
 
     function parseDevices(msg) {
         // We have to do some repairs to msg.payload as the Ninja sometimes sends a response like this:

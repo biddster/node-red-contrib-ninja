@@ -27,6 +27,7 @@ var assert = require('chai').assert;
 var _ = require('lodash-node');
 
 function loadNode(config, mod) {
+    var _messages = [], _status = undefined, _error = undefined;
     var RED = {
         nodes: {
             registerType: function (nodeName, nodeConfigFunc) {
@@ -38,14 +39,18 @@ function loadNode(config, mod) {
         on: function (name, onFunc) {
             this.onInput = onFunc;
         },
-        send: function (msg) {
-            this.msg = msg;
+        send: function (obj) {
+            if (_.isNumber(obj)) return _messages[obj];
+            else if (obj) _messages.push(obj);
+            return _messages;
         },
         error: function (error) {
-            this.nodeError = error;
+            if (error) _error = error;
+            return _error;
         },
         status: function (status) {
-            this.nodeStatus = status;
+            if (status) _status = status;
+            return _status;
         },
         log: function () {
             console.log.apply(this, arguments);
@@ -64,98 +69,102 @@ var ninjaReceive = require('../ninja/ninja-receive.js');
 describe('Ninja', function () {
     describe('send', function () {
         it('should error if you send humidity (30)', function () {
-            var send = loadNode({d: '30', da: 'blah'}, ninjaSend);
-            send.onInput({});
-            assert(send.nodeError);
-            assert.strictEqual(send.nodeStatus.fill, 'red');
+            var node = loadNode({d: '30', da: 'blah'}, ninjaSend);
+            node.onInput({});
+            assert(node.error());
+            assert.strictEqual(node.status().fill, 'red');
         });
         it('should error if you send temparature (31)', function () {
-            var send = loadNode({d: '31', da: 'blah'}, ninjaSend);
-            send.onInput({});
-            assert(send.nodeError);
-            assert.strictEqual(send.nodeStatus.fill, 'red');
+            var node = loadNode({d: '31', da: 'blah'}, ninjaSend);
+            node.onInput({});
+            assert(node.error());
+            assert.strictEqual(node.status().fill, 'red');
         });
         it('should error if D is missing', function () {
-            var send = loadNode({}, ninjaSend);
-            send.onInput({});
-            assert(send.nodeError);
-            assert.strictEqual(send.nodeError.message, 'No D value');
-            assert.strictEqual(send.nodeStatus.fill, 'red');
+            var node = loadNode({}, ninjaSend);
+            node.onInput({});
+            assert(node.error());
+            assert.strictEqual(node.error().message, 'No D value');
+            assert.strictEqual(node.status().fill, 'red');
         });
         it('should error if DA is missing', function () {
-            var send = loadNode({d: 'RF'}, ninjaSend);
-            send.onInput({});
-            assert(send.nodeError);
-            assert.strictEqual(send.nodeError.message, 'No DA value');
-            assert.strictEqual(send.nodeStatus.fill, 'red');
+            var node = loadNode({d: 'RF'}, ninjaSend);
+            node.onInput({});
+            assert(node.error());
+            assert.strictEqual(node.error().message, 'No DA value');
+            assert.strictEqual(node.status().fill, 'red');
         });
         it('should build the correct JSON for RF', function () {
-            var send = loadNode({d: 'RF', da: '0xc0f33'}, ninjaSend);
-            send.onInput({});
-            assert.isUndefined(send.nodeError);
-            assert.strictEqual(send.nodeStatus.fill, 'green');
-            assert.strictEqual(send.msg.payload, "{\"DEVICE\":[{\"G\":\"0\",\"V\":0,\"D\":11,\"DA\":\"000011000000111100110011\"}]}\r\n");
+            var node = loadNode({d: 'RF', da: '0xc0f33'}, ninjaSend);
+            node.onInput({});
+            assert.isUndefined(node.error());
+            assert.strictEqual(node.status().fill, 'green');
+            assert.strictEqual(node.send().length, 1);
+            assert.strictEqual(node.send(0).payload, "{\"DEVICE\":[{\"G\":\"0\",\"V\":0,\"D\":11,\"DA\":\"000011000000111100110011\"}]}\r\n");
         });
         it('should override the static config is msg.topic and msg.payload are supplied.', function () {
-            var send = loadNode({d: 'RF', da: '0xc0f33'}, ninjaSend);
-            send.onInput({});
-            assert.isUndefined(send.nodeError);
-            assert.strictEqual(send.nodeStatus.fill, 'green');
-            assert.strictEqual(send.msg.payload, "{\"DEVICE\":[{\"G\":\"0\",\"V\":0,\"D\":11,\"DA\":\"000011000000111100110011\"}]}\r\n");
+            var node = loadNode({d: 'RF', da: '0xc0f33'}, ninjaSend);
+            node.onInput({});
+            assert.isUndefined(node.error());
+            assert.strictEqual(node.status().fill, 'green');
+            assert.strictEqual(node.send().length, 1);
+            assert.strictEqual(node.send(0).payload, "{\"DEVICE\":[{\"G\":\"0\",\"V\":0,\"D\":11,\"DA\":\"000011000000111100110011\"}]}\r\n");
 
             // Now override the config with a msg.topic and payload.
-            send.onInput({topic: 'EYES', payload: 'green'});
-            assert.isUndefined(send.nodeError);
-            assert.strictEqual(send.nodeStatus.fill, 'green');
-            assert.strictEqual(send.msg.payload, "{\"DEVICE\":[{\"G\":\"0\",\"V\":0,\"D\":1007,\"DA\":\"green\"}]}\r\n");
+            node.onInput({topic: 'EYES', payload: 'green'});
+            assert.isUndefined(node.error());
+            assert.strictEqual(node.status().fill, 'green');
+            assert.strictEqual(node.send(1).payload, "{\"DEVICE\":[{\"G\":\"0\",\"V\":0,\"D\":1007,\"DA\":\"green\"}]}\r\n");
         });
         it('should build the correct JSON for 11', function () {
-            var send = loadNode({d: '11', da: '0x155157'}, ninjaSend);
-            send.onInput({});
-            assert.isUndefined(send.nodeError);
-            assert.strictEqual(send.nodeStatus.fill, 'green');
-            assert.strictEqual(send.msg.payload, "{\"DEVICE\":[{\"G\":\"0\",\"V\":0,\"D\":11,\"DA\":\"000101010101000101010111\"}]}\r\n");
+            var node = loadNode({d: '11', da: '0x155157'}, ninjaSend);
+            node.onInput({});
+            assert.isUndefined(node.error());
+            assert.strictEqual(node.status().fill, 'green');
+            assert.strictEqual(node.send().length, 1);
+            assert.strictEqual(node.send(0).payload, "{\"DEVICE\":[{\"G\":\"0\",\"V\":0,\"D\":11,\"DA\":\"000101010101000101010111\"}]}\r\n");
         });
     });
     describe('receive', function () {
         it('should parse real JSON', function () {
-            var receive = loadNode({}, ninjaReceive);
-            receive.onInput({payload: "{\"DEVICE\":[{\"G\":\"0\",\"V\":0,\"D\":11,\"DA\":\"000011000000111100110011\"}]}\r\n"});
-            assert.isUndefined(receive.nodeError);
-            assert.strictEqual(receive.msg.topic, 11);
-            assert.strictEqual(receive.msg.payload, '0xc0f33');
+            var node = loadNode({outputs: 1}, ninjaReceive);
+            node.onInput({payload: "{\"DEVICE\":[{\"G\":\"0\",\"V\":0,\"D\":11,\"DA\":\"000011000000111100110011\"}]}\r\n"});
+            assert.isUndefined(node.error());
+            assert.strictEqual(node.send().length, 1);
+            assert.strictEqual(node.send(0).payload.D, 11);
+            assert.strictEqual(node.send(0).payload.DA, '0xc0f33');
         });
         it('should handle an ERROR', function () {
-            var receive = loadNode({}, ninjaReceive);
-            receive.onInput({payload: '"{\\\"ERROR\\\":[{\\\"CODE\\\":2}]}\r\n"'});
-            assert(receive.nodeError);
-            assert.strictEqual(receive.nodeError.message, 'Error code: 2');
-            assert.strictEqual(receive.nodeStatus.fill, 'red');
+            var node = loadNode({outputs: 1}, ninjaReceive);
+            node.onInput({payload: '"{\\\"ERROR\\\":[{\\\"CODE\\\":2}]}\r\n"'});
+            assert(node.error());
+            assert.strictEqual(node.error().message, 'Error code: 2');
+            assert.strictEqual(node.status().fill, 'red');
         });
         it('should handle multiple ERRORs', function () {
-            var receive = loadNode({}, ninjaReceive);
-            receive.onInput({payload: '"{\\\"ERROR\\\":[{\\\"CODE\\\":1},{\\\"CODE\\\":2},{\\\"CODE\\\":3}]}\r\n"'});
-            assert(receive.nodeError);
-            assert.strictEqual(receive.nodeError.message, 'Error code: 1,2,3');
-            assert.strictEqual(receive.nodeStatus.fill, 'red');
+            var node = loadNode({outputs: 1}, ninjaReceive);
+            node.onInput({payload: '"{\\\"ERROR\\\":[{\\\"CODE\\\":1},{\\\"CODE\\\":2},{\\\"CODE\\\":3}]}\r\n"'});
+            assert(node.error());
+            assert.strictEqual(node.error().message, 'Error code: 1,2,3');
+            assert.strictEqual(node.status().fill, 'red');
         });
         it('should parse temp as a floating point', function () {
-            var receive = loadNode({}, ninjaReceive);
-            receive.onInput({payload: '"{\"DEVICE\":[{\"G\":\"0101\",\"V\":0,\"D\":31,\"DA\":23.80000}]}\r\n"'});
-            assert.isUndefined(receive.nodeError);
-            assert.strictEqual(receive.msg.topic, 31);
-            assert.strictEqual(receive.msg.payload, 23.80000);
+            var node = loadNode({outputs: 1}, ninjaReceive);
+            node.onInput({payload: '"{\"DEVICE\":[{\"G\":\"0101\",\"V\":0,\"D\":31,\"DA\":23.80000}]}\r\n"'});
+            assert.isUndefined(node.error());
+            assert.strictEqual(node.send().length, 1);
+            assert.strictEqual(node.send(0).payload.D, 31);
+            assert.strictEqual(node.send(0).payload.DA, 23.80000);
         });
         it('should handle multiple devices', function () {
-            var receive = loadNode({}, ninjaReceive);
-            receive.onInput({payload: '"{\"DEVICE\":[{\"G\":\"0101\",\"V\":0,\"D\":31,\"DA\":23.80000},{\"G\":\"0102\",\"V\":0,\"D\":31,\"DA\":22.50000}]}\r\n"'});
-            assert.isUndefined(receive.nodeError);
-            assert(_.isArray(receive.msg));
-            assert.strictEqual(receive.msg.length, 2);
-            assert.strictEqual(receive.msg[0].topic, 31);
-            assert.strictEqual(receive.msg[0].payload, 23.80000);
-            assert.strictEqual(receive.msg[1].topic, 31);
-            assert.strictEqual(receive.msg[1].payload, 22.50000);
+            var node = loadNode({outputs: 1}, ninjaReceive);
+            node.onInput({payload: '"{\"DEVICE\":[{\"G\":\"0101\",\"V\":0,\"D\":31,\"DA\":23.80000},{\"G\":\"0102\",\"V\":0,\"D\":31,\"DA\":22.50000}]}\r\n"'});
+            assert.isUndefined(node.error());
+            assert.strictEqual(node.send().length, 2);
+            assert.strictEqual(node.send(0).payload.D, 31);
+            assert.strictEqual(node.send(0).payload.DA, 23.80000);
+            assert.strictEqual(node.send(1).payload.D, 31);
+            assert.strictEqual(node.send(1).payload.DA, 22.50000);
         });
     });
 });
