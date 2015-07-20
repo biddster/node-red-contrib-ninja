@@ -28,18 +28,25 @@ THE SOFTWARE.
         color: '#FFDF00',
         defaults: {
             d: {value: 'RF'},
-            da: {value: ''}
+            da: {value: ''},
+            name: {value: ''}
         },
         inputs: 1,
         outputs: 1,
         icon: 'ninja.png',
-        label: 'Ninja TX',
+        label: function () {
+            return this.name || 'Ninja TX';
+        },
         paletteLabel: 'Ninja TX',
         align: 'right'
     });
 </script>
 
 <script type="text/x-red" data-template-name="ninja-send">
+    <div class="form-row">
+        <label for="node-input-name"><i class="icon-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
     <div class="form-row">
         <label for="node-input-d"><i class="icon-tag"></i> Device ID (D)</label>
         <input type="text" id="node-input-d" placeholder="(D)">
