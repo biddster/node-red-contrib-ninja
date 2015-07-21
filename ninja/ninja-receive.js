@@ -31,16 +31,14 @@ module.exports = function (RED) {
         var node = this;
         node.on('input', function (msg) {
             try {
-                parseDevices(msg).forEach(function (device) {
-                    if (device.D === 11) {
-                        // RF (11) values come back as base 2 e.g. 000011000000111100110011
-                        device.DA = '0x' + parseInt(device.DA, 2).toString(16);
-                    }
-                    node.send({
-                        payload: device
-                    });
-                });
-                node.status({fill: "green", shape: "dot", text: "OK"});
+                var obj = parse(msg);
+                if (obj.ACK) {
+                    send(node, "ACK", obj.ACK);
+                } else if (obj.DEVICE) {
+                    send(node, "DEVICE", obj.DEVICE);
+                } else {
+                    raiseError(obj);
+                }
             } catch (error) {
                 node.log(error.stack);
                 node.error(error, msg);
@@ -49,7 +47,7 @@ module.exports = function (RED) {
         });
     });
 
-    function parseDevices(msg) {
+    function parse(msg) {
         // We have to do some repairs to msg.payload as the Ninja sometimes sends a response like this:
         //     ""{\"ERROR\":[{\"CODE\":2}]}\r\n""
         // For JSON.parse we have to strip leading and trailing ", remove \r\n and unescape the \".
@@ -63,9 +61,32 @@ module.exports = function (RED) {
         var obj = JSON.parse(payload);
         if (_.isString(obj)) {
             throw new Error('Ninja response parse error. Please report on GitHub along with the payload.');
-        } else if (obj.ERROR) {
-            throw new Error('Error code: ' + _.pluck(obj.ERROR, 'CODE').join(','));
         }
-        return obj.DEVICE;
+        return obj;
+    }
+
+    function send(node, type, devices) {
+        devices.forEach(function (device) {
+            device.T = type;
+            if (device.D === 11) {
+                // RF (11) values come back as base 2 e.g. 000011000000111100110011
+                device.DA = '0x' + parseInt(device.DA, 2).toString(16);
+            }
+            node.send({
+                topic: device.D + '::' + device.G + '::' + device.V,
+                payload: device
+            });
+        });
+        node.status({fill: "green", shape: "dot", text: "OK"});
+    }
+
+    function raiseError(obj) {
+        var errMsg;
+        if (obj.ERROR) {
+            errMsg = 'Error code: ' + _.pluck(obj.ERROR, 'CODE').join(',');
+        } else {
+            errMsg = 'Unexpected payload: ' + JSON.stringify(obj, null, 0);
+        }
+        throw new Error(errMsg);
     }
 };
