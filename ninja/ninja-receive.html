@@ -25,21 +25,33 @@ THE SOFTWARE.
 <script type="text/javascript">
     RED.nodes.registerType('ninja-receive', {
         category: 'function',
-        color: '#2196F3',
-        defaults: {},
+        color: '#FFDF00',
+        defaults: {
+            name: {value: ''}
+        },
         inputs: 1,
         outputs: 1,
-        icon: "file.png",
+        icon: 'ninja.png',
         label: function () {
-            return this.name || "ninja-receive";
-        }
+            return this.name || 'Ninja RX'
+        },
+        paletteLabel: 'Ninja RX'
     });
 </script>
 
 <script type="text/x-red" data-template-name="ninja-receive">
-
+    <div class="form-row">
+        <label for="node-input-name"><i class="icon-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
 </script>
 
 <script type="text/x-red" data-help-name="ninja-receive">
-    <p>A Ninja Block node that prepares a payload which can be send by a downstream serial node.</p>
+    <p>A node that parses a JSON response from a Ninja Block.</p>
+    <h2>Description</h2>
+    <p>This is very helpful to read first: <a href="http://shop.ninjablocks.com/blogs/how-to/8589165-communicating-directly-with-the-arduino-in-the-ninja-block">
+    http://shop.ninjablocks.com/blogs/how-to/8589165-communicating-directly-with-the-arduino-in-the-ninja-block</a></p>
+    <h2>Outputs</h2>
+    <p>The value of D will be in msg.topic</p>
+    <p>The value of DA will be in msg.payload</p>
 </script>

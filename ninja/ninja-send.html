@@ -25,31 +25,66 @@ THE SOFTWARE.
 <script type="text/javascript">
     RED.nodes.registerType('ninja-send', {
         category: 'function',
-        color: '#3F51B5',
+        color: '#FFDF00',
         defaults: {
             d: {value: 'RF'},
-            da: {value: ''}
+            da: {value: ''},
+            name: {value: ''}
         },
         inputs: 1,
         outputs: 1,
-        icon: "file.png",
+        icon: 'ninja.png',
         label: function () {
-            return this.name || "ninja-send";
-        }
+            return this.name || 'Ninja TX';
+        },
+        paletteLabel: 'Ninja TX',
+        align: 'right'
     });
 </script>
 
 <script type="text/x-red" data-template-name="ninja-send">
     <div class="form-row">
+        <label for="node-input-name"><i class="icon-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+    <div class="form-row">
         <label for="node-input-d"><i class="icon-tag"></i> Device ID (D)</label>
         <input type="text" id="node-input-d" placeholder="(D)">
     </div>
     <div class="form-row">
-        <label for="node-input-da"><i class="icon-tag"></i> What is DA? (DA)</label>
-        <input type="text" id="node-input-value" placeholder="(DA)">
+        <label for="node-input-da"><i class="icon-tag"></i> The value to send to the Ninja (DA)</label>
+        <input type="text" id="node-input-da" placeholder="(DA)">
     </div>
 </script>
 
 <script type="text/x-red" data-help-name="ninja-send">
-    <p>A Ninja Block node that prepares a payload which can be send by a downstream serial node.</p>
+    <p>A node that builds a JSON payload suitable for sending to a Ninja Block over a serial port.</p>
+    <h2>Description</h2>
+    <p>This is very helpful to read first: <a href="http://shop.ninjablocks.com/blogs/how-to/8589165-communicating-directly-with-the-arduino-in-the-ninja-block">
+    http://shop.ninjablocks.com/blogs/how-to/8589165-communicating-directly-with-the-arduino-in-the-ninja-block</a></p>
+    <h2>Inputs</h2>
+    <p>This node's property values are not mandatory. You have the choice to configure this node statically by entering property values
+         or to inject values dynamically into this node from an upstream node. If you choose to inject values from upstream,
+         the value for device ID (D) is taken from msg.topic and the value of DA is taken from msg.payload.
+    </p>
+    <p><i>Note that values supplied from upstream via msg will override any property values set in the node editor.</i></p>
+    <p>In either case, this node will send a downstream msg where msg.payload is the appropriately formatted JSON suitable for the Ninja Block. </p>
+    <table border="1">
+      <tr>
+        <th>D</th>
+        <th>DA</th>
+      </tr>
+      <tr>
+        <td>'RF' or 11</td>
+        <td>Values can be hex or decimal. If you use hex, you must prefix with 0x.</td>
+      </tr>
+      <tr>
+        <td>'EYES' or 1007</td>
+        <td>This expects RGB hex colour values. E.g. 0000FF turns the eyes blue. 00FF00 turns the eyes green</td>
+      </tr>
+      <tr>
+        <td>'LED' or 999</td>
+        <td>This expects RGB hex colour values. E.g. 00FF00 turns the status green</td>
+      </tr>
+    </table>
 </script>
