@@ -10,4 +10,7 @@ Change directory to your node-red installation and issue:
     
 ## Usage and configuration
     
-WIP        
+In this repo there is example-flow.json. You can import that into a node-red workspace and it will provide a template
+        for getting working with the Ninja Block.
+        
+Further documentation will follow in time.
