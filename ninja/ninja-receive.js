@@ -24,7 +24,7 @@
 
 module.exports = function (RED) {
     'use strict';
-    var _ = require('lodash-node');
+    var _ = require('lodash');
 
     RED.nodes.registerType("ninja-receive", function (config) {
         RED.nodes.createNode(this, config);

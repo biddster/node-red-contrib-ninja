@@ -2,6 +2,7 @@
   "name": "node-red-contrib-ninja",
   "version": "0.3.0",
   "description": "Node-red nodes that allow one to communicate with a Ninja Block.",
+  "repository": "https://github.com/biddster/node-red-contrib-ninja",
   "main": "",
   "directories": {
     "test": "tests"
@@ -30,6 +31,6 @@
     }
   },
   "dependencies": {
-    "lodash-node": "^3.10.0"
+    "lodash": "^3.10.1"
   }
 }

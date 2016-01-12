@@ -24,7 +24,7 @@
 
 "use strict";
 var assert = require('chai').assert;
-var _ = require('lodash-node');
+var _ = require('lodash');
 
 function loadNode(config, mod) {
     var _messages = [], _status = undefined, _error = undefined;
