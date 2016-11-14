@@ -91,7 +91,7 @@ The above message is described here:
 A 'serial out' node is wired into the output of the Ninja TX node. The Ninja TX node takes care of building the necessary JSON 
 required for comprehension by the cloak via the serial port.
 
-### Supported values
+#### Supported values
 
 | Identifier | Friendly Identifier | Value | Description |
 | --------------- | --------------- | --------------- | --------------- |
