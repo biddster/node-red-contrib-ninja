@@ -84,9 +84,9 @@ The above message is described here:
 | Property | Description |
 | --------------- | --------------- |  
 |  topic | A composite value of the identifier (D) , the vendor ID (V) and port (G). The format is `D::V::G`. |
-|  payload.T | The type of the message, can be DEVICE or ACK |
-|  payload.D | The identifier (see the table above) |
-|  payload.DA | The value (see the table above)  |
+|  payload.T | The type of the message, DEVICE |
+|  payload.D | The identifier, 31 i.e. temperature |
+|  payload.DA | The value, e.g. 23.8  |
 
 
 ## Sending data to Ninja sensors and 433mz peripherals
