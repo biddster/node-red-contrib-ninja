@@ -51,7 +51,7 @@ For reference, here's what the JSON properties refer to:
 
 A 'serial in' node is wired directly into the Ninja RX node. 
 
-
+![Ninja RX](https://github.com/biddster/node-red-contrib-ninja/raw/node-red-contrib-ninja-1/examples/NinjaRX.png)
 
 The Ninja RX node understands the JSON payloads that the cloak
 sends and parses them into a NodeRED message so the data can be acted upon in a NodeRED flow. For example, this output 
@@ -91,10 +91,16 @@ The above message is described here:
 
 ## Sending data to Ninja sensors and 433mz peripherals
 
-A 'serial out' node is wired into the output of the Ninja TX node. The Ninja TX node takes care of building the necessary JSON 
+A 'serial out' node is wired into the output of the Ninja TX node. 
+
+![Ninja TX](https://github.com/biddster/node-red-contrib-ninja/raw/node-red-contrib-ninja-1/examples/NinjaTX.png)
+
+The Ninja TX node takes care of building the necessary JSON 
 required for comprehension by the cloak via the serial port.
 
 ### Supported values
+
+When sending data, you can use the numeric identifier or the friendly identifier as specified below:
 
 | Identifier | Friendly Identifier | Value | Description |
 | --------------- | --------------- | --------------- | --------------- |
