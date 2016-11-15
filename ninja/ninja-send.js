@@ -30,14 +30,12 @@ module.exports = function (RED) {
         var node = this;
         node.on('input', function (msg) {
             try {
-                node.log('Sending - d [' + config.d + '] da [' + config.da + '] topic [' + msg.topic + '] payload [' + msg.payload + ']\n');
                 var d = prepareD(msg.topic || config.d);
                 var da = prepareDA(d, msg.payload || config.da);
                 msg.payload = JSON.stringify({"DEVICE": [{"G": "0", "V": 0, "D": d, "DA": da}]}, null, 0) + '\r\n';
                 node.send(msg);
                 node.status({fill: "green", shape: "dot", text: "OK"});
             } catch (error) {
-                node.log(error.stack);
                 node.error(error, msg);
                 node.status({fill: "red", shape: "dot", text: error.message});
             }

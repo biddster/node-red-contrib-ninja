@@ -40,7 +40,6 @@ module.exports = function (RED) {
                     raiseError(obj);
                 }
             } catch (error) {
-                node.log(error.stack);
                 node.error(error, msg);
                 node.status({fill: "red", shape: "dot", text: error.message});
             }
