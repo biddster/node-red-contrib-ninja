@@ -1,6 +1,7 @@
 # node-red-contrib-ninja
 
-A NodeRED module which allows one to control a Ninja Block.
+A NodeRED module which allows one to control a Ninja Block. It provides two NodeRED nodes, one to transmit data (Ninja TX) to the
+Ninja and one to receive data from it (Ninja RX).
 
 ## Installation
 
@@ -13,9 +14,7 @@ Change directory to your NodeRED installation and issue:
 In this repo there is example-flow.json. You can import that into a NodeRED workspace and it will provide a template
         for getting working with the Ninja Block.
 
-## How does this node work?
-
-### Communicating with Ninja hardware
+## How do the Ninja TX and RX nodes work?
 
 The Ninja Block has an Arduino cloak for communicating with its hardware (internal sensors and 433mHz tx/rx). 
 It sends and receives data via the serial port at /dev/ttyO1 (9600 baud). NodeRED can easily communicate with serial devices
@@ -48,9 +47,13 @@ For reference, here's what the JSON properties refer to:
 |  V | the vendor ID of the device, unique to the manufacturer |
 |  G | a number corresponding to the port that the device is attached to |
 
-### Receiving data from Ninja sensors and 433mz peripherals
+## Receiving data from Ninja sensors and 433mz peripherals
 
-A 'serial in' node is wired directly into the Ninja RX node. This Ninja RX node understands the JSON payloads that the cloak
+A 'serial in' node is wired directly into the Ninja RX node. 
+
+
+
+The Ninja RX node understands the JSON payloads that the cloak
 sends and parses them into a NodeRED message so the data can be acted upon in a NodeRED flow. For example, this output 
 can be wired into a switch node (part of NodeRED) so that action can then be taken depending upon the received data value. 
 
@@ -86,12 +89,12 @@ The above message is described here:
 |  payload.DA | The value (see the table above)  |
 
 
-### Sending data to Ninja sensors and 433mz peripherals
+## Sending data to Ninja sensors and 433mz peripherals
 
 A 'serial out' node is wired into the output of the Ninja TX node. The Ninja TX node takes care of building the necessary JSON 
 required for comprehension by the cloak via the serial port.
 
-#### Supported values
+### Supported values
 
 | Identifier | Friendly Identifier | Value | Description |
 | --------------- | --------------- | --------------- | --------------- |
@@ -103,12 +106,12 @@ required for comprehension by the cloak via the serial port.
 
 __Note that you cannot send temperature and humidity, you can only receive data from these Ninja sensors.__
 
-#### Static sending of data
+### Static sending of data
 
 You can configure the data to send via static configuration in NodeRED. When you drag this node on 
  to the workspace, you can enter the values you want to send as per the table above.  
        
-#### Dynamic sending of data
+### Dynamic sending of data
         
 Any configuration entered when configuring this node in NodeRED can be overridden by the incoming message.
 
