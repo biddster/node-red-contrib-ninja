@@ -58,33 +58,51 @@ THE SOFTWARE.
 </script>
 
 <script type="text/x-red" data-help-name="ninja-send">
-    <p>A node that builds a JSON payload suitable for sending to a Ninja Block over a serial port.</p>
-    <h2>Description</h2>
-    <p>This is very helpful to read first: <a href="http://shop.ninjablocks.com/blogs/how-to/8589165-communicating-directly-with-the-arduino-in-the-ninja-block">
-    http://shop.ninjablocks.com/blogs/how-to/8589165-communicating-directly-with-the-arduino-in-the-ninja-block</a></p>
-    <h2>Inputs</h2>
-    <p>This node's property values are not mandatory. You have the choice to configure this node statically by entering property values
-         or to inject values dynamically into this node from an upstream node. If you choose to inject values from upstream,
-         the value for device ID (D) is taken from msg.topic and the value of DA is taken from msg.payload.
-    </p>
-    <p><i>Note that values supplied from upstream via msg will override any property values set in the node editor.</i></p>
-    <p>In either case, this node will send a downstream msg where msg.payload is the appropriately formatted JSON suitable for the Ninja Block. </p>
-    <table border="1">
-      <tr>
-        <th>D</th>
-        <th>DA</th>
-      </tr>
-      <tr>
-        <td>'RF' or 11</td>
-        <td>Values can be hex or decimal. If you use hex, you must prefix with 0x.</td>
-      </tr>
-      <tr>
-        <td>'EYES' or 1007</td>
-        <td>This expects RGB hex colour values. E.g. 0000FF turns the eyes blue. 00FF00 turns the eyes green</td>
-      </tr>
-      <tr>
-        <td>'LED' or 999</td>
-        <td>This expects RGB hex colour values. E.g. 00FF00 turns the status green</td>
-      </tr>
-    </table>
+  <h2 id="sending-data-to-ninja-sensors-and-433mz-peripherals">Sending data to Ninja sensors and 433mz peripherals</h2>
+<p>A &#39;serial out&#39; node is wired into the output of the Ninja TX node. </p>
+<p><img src="https://github.com/biddster/node-red-contrib-ninja/raw/node-red-contrib-ninja-1/examples/NinjaTX.png" alt="Ninja TX"></p>
+<p>The Ninja TX node takes care of building the necessary JSON<br>required for comprehension by the cloak via the serial port.</p>
+<h3 id="supported-values">Supported values</h3>
+<p>When sending data, you can use the numeric identifier or the friendly identifier as specified below:</p>
+<table>
+<thead>
+<tr>
+<th>Identifier</th>
+<th>Friendly Identifier</th>
+<th>Value</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>11</td>
+<td>rf</td>
+<td>Hex value e.g. 0xc0f33</td>
+<td>This instructs the cloak to broadcast the value over 433mhz.</td>
+</tr>
+<tr>
+<td>999</td>
+<td>led</td>
+<td>Hex colour value</td>
+<td>This instructs the Ninja to turn its led to the supplied colour value</td>
+</tr>
+<tr>
+<td>1007</td>
+<td>eyes</td>
+<td>Hex colour value</td>
+<td>This instructs the Ninja to turn its eyes to the supplied colour value</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Note that you cannot send temperature and humidity, you can only receive data from these Ninja sensors.</strong></p>
+<h3 id="static-sending-of-data">Static sending of data</h3>
+<p>You can configure the data to send via static configuration in NodeRED. When you drag this node on<br> to the workspace, you can enter the values you want to send as per the table above.  </p>
+<h3 id="dynamic-sending-of-data">Dynamic sending of data</h3>
+<p>Any configuration entered when configuring this node in NodeRED can be overridden by the incoming message.</p>
+<p>For example, to turn the ninja eyes green, send a message to the TX node like this:</p>
+<pre><code>{
+    &quot;topic&quot;: &quot;eyes&quot;,
+    &quot;payload&quot;: &quot;00ff00&quot;
+}
+</code></pre>
 </script>

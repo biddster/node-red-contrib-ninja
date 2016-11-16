@@ -126,7 +126,7 @@ For example, to turn the ninja eyes green, send a message to the TX node like th
 ```
 {
     "topic": "eyes",
-    "payload": "0x00ff00"
+    "payload": "00ff00"
 }
 ```
         
