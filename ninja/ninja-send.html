@@ -25,31 +25,84 @@ THE SOFTWARE.
 <script type="text/javascript">
     RED.nodes.registerType('ninja-send', {
         category: 'function',
-        color: '#3F51B5',
+        color: '#FFDF00',
         defaults: {
             d: {value: 'RF'},
-            da: {value: ''}
+            da: {value: ''},
+            name: {value: ''}
         },
         inputs: 1,
         outputs: 1,
-        icon: "file.png",
+        icon: 'ninja.png',
         label: function () {
-            return this.name || "ninja-send";
-        }
+            return this.name || 'Ninja TX';
+        },
+        paletteLabel: 'Ninja TX',
+        align: 'right'
     });
 </script>
 
 <script type="text/x-red" data-template-name="ninja-send">
     <div class="form-row">
+        <label for="node-input-name"><i class="icon-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+    <div class="form-row">
         <label for="node-input-d"><i class="icon-tag"></i> Device ID (D)</label>
         <input type="text" id="node-input-d" placeholder="(D)">
     </div>
     <div class="form-row">
-        <label for="node-input-da"><i class="icon-tag"></i> What is DA? (DA)</label>
-        <input type="text" id="node-input-value" placeholder="(DA)">
+        <label for="node-input-da"><i class="icon-tag"></i> The value to send to the Ninja (DA)</label>
+        <input type="text" id="node-input-da" placeholder="(DA)">
     </div>
 </script>
 
 <script type="text/x-red" data-help-name="ninja-send">
-    <p>A Ninja Block node that prepares a payload which can be send by a downstream serial node.</p>
+  <h2 id="sending-data-to-ninja-sensors-and-433mz-peripherals">Sending data to Ninja sensors and 433mz peripherals</h2>
+<p>A &#39;serial out&#39; node is wired into the output of the Ninja TX node. </p>
+<p><img src="https://github.com/biddster/node-red-contrib-ninja/raw/node-red-contrib-ninja-1/examples/NinjaTX.png" alt="Ninja TX"></p>
+<p>The Ninja TX node takes care of building the necessary JSON<br>required for comprehension by the cloak via the serial port.</p>
+<h3 id="supported-values">Supported values</h3>
+<p>When sending data, you can use the numeric identifier or the friendly identifier as specified below:</p>
+<table>
+<thead>
+<tr>
+<th>Identifier</th>
+<th>Friendly Identifier</th>
+<th>Value</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>11</td>
+<td>rf</td>
+<td>Hex value e.g. 0xc0f33</td>
+<td>This instructs the cloak to broadcast the value over 433mhz.</td>
+</tr>
+<tr>
+<td>999</td>
+<td>led</td>
+<td>Hex colour value</td>
+<td>This instructs the Ninja to turn its led to the supplied colour value</td>
+</tr>
+<tr>
+<td>1007</td>
+<td>eyes</td>
+<td>Hex colour value</td>
+<td>This instructs the Ninja to turn its eyes to the supplied colour value</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Note that you cannot send temperature and humidity, you can only receive data from these Ninja sensors.</strong></p>
+<h3 id="static-sending-of-data">Static sending of data</h3>
+<p>You can configure the data to send via static configuration in NodeRED. When you drag this node on<br> to the workspace, you can enter the values you want to send as per the table above.  </p>
+<h3 id="dynamic-sending-of-data">Dynamic sending of data</h3>
+<p>Any configuration entered when configuring this node in NodeRED can be overridden by the incoming message.</p>
+<p>For example, to turn the ninja eyes green, send a message to the TX node like this:</p>
+<pre><code>{
+    &quot;topic&quot;: &quot;eyes&quot;,
+    &quot;payload&quot;: &quot;00ff00&quot;
+}
+</code></pre>
 </script>

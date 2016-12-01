@@ -25,57 +25,57 @@
 module.exports = function (RED) {
     'use strict';
 
-    function prepareD(did) {
-        if (typeof did === 'string') {
-            switch (did.toLowerCase()) {
-                case 'rf':
-                    return 11;
-                case 'eyes':
-                    return 1007;
-                case 'led':
-                    return 999;
-                default:
-                    throw new Error('Unrecognised DID symbol [' + did + '], try using the actual numeric value instead');
+    RED.nodes.registerType("ninja-send", function (config) {
+        RED.nodes.createNode(this, config);
+        var node = this;
+        node.on('input', function (msg) {
+            try {
+                var d = prepareD(msg.topic || config.d);
+                var da = prepareDA(d, msg.payload || config.da);
+                msg.payload = JSON.stringify({"DEVICE": [{"G": "0", "V": 0, "D": d, "DA": da}]}, null, 0) + '\r\n';
+                node.send(msg);
+                node.status({fill: "green", shape: "dot", text: "OK"});
+            } catch (error) {
+                node.error(error, msg);
+                node.status({fill: "red", shape: "dot", text: error.message});
             }
+        });
+    });
+
+    function prepareD(d) {
+        if (!d) {
+            throw new Error('No D value');
         }
-        return did;
+        switch (d.toLowerCase()) {
+            case 'rf':
+                return 11;
+            case 'eyes':
+                return 1007;
+            case 'led':
+                return 999;
+            default:
+                return parseInt(d);
+        }
     }
 
-    function prepareDA(did, value) {
-        switch (did) {
+    function prepareDA(d, da) {
+        if (!da) {
+            throw new Error('No DA value');
+        }
+        switch (d) {
             case 11:
-                value = parseInt(value).toString(2);
-                while (value.length < 24) {
-                    value = '0' + value;
+                da = parseInt(da).toString(2);
+                while (da.length < 24) {
+                    da = '0' + da;
                 }
                 break;
             case 30:
                 throw new Error('Cannot make a send request for Humidity');
             case 31:
-                throw new Error('Cannot make a send request for Temparature');
+                throw new Error('Cannot make a send request for Temperature');
             default:
                 break;
         }
-        return value;
+        return da;
     }
-
-    function NinjaSend(config) {
-        RED.nodes.createNode(this, config);
-        var node = this;
-        this.d = config.d;
-        this.da = config.da;
-        this.on('input', function (msg) {
-            try {
-                // TODO - the preparation of these two could be at config time? How do errors work there? The same?
-                var d = prepareD(node.d);
-                var da = prepareDA(d, node.da);
-                msg.payload = JSON.stringify({"DEVICE": [{"G": "0", "V": 0, "D": d, "DA": da}]}, null, 0) + '\r\n';
-                node.send(msg);
-            } catch (error) {
-                node.error(error.message, msg);
-            }
-        });
-    }
-
-    RED.nodes.registerType("ninja-send", NinjaSend);
 };

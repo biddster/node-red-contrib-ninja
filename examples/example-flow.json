@@ -1,0 +1,494 @@
+[
+  {
+    "id": "bf7237a7.408dc8",
+    "type": "serial-port",
+    "serialport": "/dev/ttyO1",
+    "serialbaud": "9600",
+    "databits": "8",
+    "parity": "none",
+    "stopbits": "1",
+    "newline": "\\n",
+    "bin": "false",
+    "out": "char",
+    "addchar": false
+  },
+  {
+    "id": "59527f82.a6ad8",
+    "type": "serial in",
+    "name": "read port",
+    "serial": "bf7237a7.408dc8",
+    "x": 64,
+    "y": 218,
+    "z": "4471196e.bb8ee8",
+    "wires": [
+      [
+        "47c06a72.b83f94"
+      ]
+    ]
+  },
+  {
+    "id": "e0107aaa.1fef88",
+    "type": "debug",
+    "name": "",
+    "active": true,
+    "console": "false",
+    "complete": "payload",
+    "x": 1057.500015258789,
+    "y": 136.50000953674316,
+    "z": "4471196e.bb8ee8",
+    "wires": []
+  },
+  {
+    "id": "41d56431.be2a9c",
+    "type": "serial out",
+    "name": "",
+    "serial": "bf7237a7.408dc8",
+    "x": 519,
+    "y": 48,
+    "z": "4471196e.bb8ee8",
+    "wires": []
+  },
+  {
+    "id": "6a20fc0f.95df04",
+    "type": "inject",
+    "name": "",
+    "topic": "rf",
+    "payload": "0x155157",
+    "payloadType": "string",
+    "repeat": "",
+    "crontab": "",
+    "once": false,
+    "x": 121.33333587646484,
+    "y": 134.00000476837158,
+    "z": "4471196e.bb8ee8",
+    "wires": [
+      [
+        "1a86320f.e579ce"
+      ]
+    ]
+  },
+  {
+    "id": "a2691f03.5d96e",
+    "type": "inject",
+    "name": "Status LED",
+    "topic": "999",
+    "payload": "FFFF00",
+    "payloadType": "string",
+    "repeat": "",
+    "crontab": "",
+    "once": false,
+    "x": 134.3333339691162,
+    "y": 43.333333015441895,
+    "z": "4471196e.bb8ee8",
+    "wires": [
+      [
+        "1a86320f.e579ce"
+      ]
+    ]
+  },
+  {
+    "id": "47c06a72.b83f94",
+    "type": "ninja-receive",
+    "name": "receive",
+    "x": 202,
+    "y": 222,
+    "z": "4471196e.bb8ee8",
+    "wires": [
+      [
+        "ec9ca91f.136358"
+      ]
+    ]
+  },
+  {
+    "id": "1a86320f.e579ce",
+    "type": "ninja-send",
+    "d": "eyes",
+    "da": "0",
+    "x": 352.6666564941406,
+    "y": 76.33333015441895,
+    "z": "4471196e.bb8ee8",
+    "wires": [
+      [
+        "41d56431.be2a9c"
+      ]
+    ]
+  },
+  {
+    "id": "1c9137ca.e36ec8",
+    "type": "inject",
+    "name": "",
+    "topic": "eyes",
+    "payload": "FF0000",
+    "payloadType": "string",
+    "repeat": "",
+    "crontab": "",
+    "once": false,
+    "x": 131.33333587646484,
+    "y": 88.3333330154419,
+    "z": "4471196e.bb8ee8",
+    "wires": [
+      [
+        "1a86320f.e579ce"
+      ]
+    ]
+  },
+  {
+    "id": "ec9ca91f.136358",
+    "type": "switch",
+    "name": "Device categories",
+    "property": "payload.D",
+    "rules": [
+      {
+        "t": "eq",
+        "v": "31"
+      },
+      {
+        "t": "eq",
+        "v": "30"
+      },
+      {
+        "t": "eq",
+        "v": "11"
+      },
+      {
+        "t": "eq",
+        "v": "1007"
+      },
+      {
+        "t": "eq",
+        "v": "999"
+      }
+    ],
+    "checkall": "true",
+    "outputs": 5,
+    "x": 370.00000762939453,
+    "y": 222.25000381469727,
+    "z": "4471196e.bb8ee8",
+    "wires": [
+      [
+        "58e033cb.a71fcc"
+      ],
+      [
+        "a668b779.599748"
+      ],
+      [
+        "7169b301.8e964c"
+      ],
+      [
+        "ef438690.10bc78"
+      ],
+      [
+        "7571be54.8a8e4"
+      ]
+    ]
+  },
+  {
+    "id": "58e033cb.a71fcc",
+    "type": "switch",
+    "name": "Temperatures",
+    "property": "payload.G",
+    "rules": [
+      {
+        "t": "eq",
+        "v": "0101"
+      },
+      {
+        "t": "eq",
+        "v": "0201"
+      },
+      {
+        "t": "eq",
+        "v": "0301"
+      }
+    ],
+    "checkall": "true",
+    "outputs": 3,
+    "x": 598.0000076293945,
+    "y": 122.25000190734863,
+    "z": "4471196e.bb8ee8",
+    "wires": [
+      [
+        "6e288360.91d77c"
+      ],
+      [
+        "5c1a8bc.fa3e574"
+      ],
+      [
+        "6c39fc24.93c604"
+      ]
+    ]
+  },
+  {
+    "id": "6e288360.91d77c",
+    "type": "change",
+    "name": "temp 1",
+    "rules": [
+      {
+        "t": "set",
+        "p": "payload",
+        "to": "msg.payload.DA"
+      }
+    ],
+    "action": "",
+    "property": "",
+    "from": "",
+    "to": "",
+    "reg": false,
+    "x": 795.2500114440918,
+    "y": 80.25000190734863,
+    "z": "4471196e.bb8ee8",
+    "wires": [
+      [
+        "e0107aaa.1fef88"
+      ]
+    ]
+  },
+  {
+    "id": "5c1a8bc.fa3e574",
+    "type": "change",
+    "name": "temp 2",
+    "rules": [
+      {
+        "t": "set",
+        "p": "payload",
+        "to": "msg.payload.DA"
+      }
+    ],
+    "action": "",
+    "property": "",
+    "from": "",
+    "to": "",
+    "reg": false,
+    "x": 801.25,
+    "y": 131.25,
+    "z": "4471196e.bb8ee8",
+    "wires": [
+      [
+        "e0107aaa.1fef88"
+      ]
+    ]
+  },
+  {
+    "id": "6c39fc24.93c604",
+    "type": "change",
+    "name": "temp 3",
+    "rules": [
+      {
+        "t": "set",
+        "p": "payload",
+        "to": "msg.payload.DA"
+      }
+    ],
+    "action": "",
+    "property": "",
+    "from": "",
+    "to": "",
+    "reg": false,
+    "x": 805.0000114440918,
+    "y": 180.00000190734863,
+    "z": "4471196e.bb8ee8",
+    "wires": [
+      [
+        "e0107aaa.1fef88"
+      ]
+    ]
+  },
+  {
+    "id": "a668b779.599748",
+    "type": "switch",
+    "name": "humidity",
+    "property": "payload.G",
+    "rules": [
+      {
+        "t": "eq",
+        "v": "0101"
+      },
+      {
+        "t": "eq",
+        "v": "0201"
+      },
+      {
+        "t": "eq",
+        "v": "0301"
+      }
+    ],
+    "checkall": "true",
+    "outputs": 3,
+    "x": 592.5000114440918,
+    "y": 205.00000381469727,
+    "z": "4471196e.bb8ee8",
+    "wires": [
+      [
+        "7b51b18b.84ae5"
+      ],
+      [
+        "f919c3e6.06e64"
+      ],
+      [
+        "fb61f513.049e08"
+      ]
+    ]
+  },
+  {
+    "id": "7b51b18b.84ae5",
+    "type": "change",
+    "name": "humidity 1",
+    "rules": [
+      {
+        "t": "set",
+        "p": "payload",
+        "to": "msg.payload.DA"
+      }
+    ],
+    "action": "",
+    "property": "",
+    "from": "",
+    "to": "",
+    "reg": false,
+    "x": 803.7500114440918,
+    "y": 230.00000095367432,
+    "z": "4471196e.bb8ee8",
+    "wires": [
+      [
+        "e0107aaa.1fef88"
+      ]
+    ]
+  },
+  {
+    "id": "f919c3e6.06e64",
+    "type": "change",
+    "name": "humidity 2",
+    "rules": [
+      {
+        "t": "set",
+        "p": "payload",
+        "to": "msg.payload.DA"
+      }
+    ],
+    "action": "",
+    "property": "",
+    "from": "",
+    "to": "",
+    "reg": false,
+    "x": 815.0000152587891,
+    "y": 268.75000381469727,
+    "z": "4471196e.bb8ee8",
+    "wires": [
+      [
+        "e0107aaa.1fef88"
+      ]
+    ]
+  },
+  {
+    "id": "fb61f513.049e08",
+    "type": "change",
+    "name": "humidity 3",
+    "rules": [
+      {
+        "t": "set",
+        "p": "payload",
+        "to": "msg.payload.DA"
+      }
+    ],
+    "action": "",
+    "property": "",
+    "from": "",
+    "to": "",
+    "reg": false,
+    "x": 812.5,
+    "y": 323.75,
+    "z": "4471196e.bb8ee8",
+    "wires": [
+      [
+        "e0107aaa.1fef88"
+      ]
+    ]
+  },
+  {
+    "id": "7169b301.8e964c",
+    "type": "change",
+    "name": "433 RX",
+    "rules": [
+      {
+        "t": "set",
+        "p": "payload",
+        "to": "msg.payload.DA"
+      }
+    ],
+    "action": "",
+    "property": "",
+    "from": "",
+    "to": "",
+    "reg": false,
+    "x": 665,
+    "y": 385,
+    "z": "4471196e.bb8ee8",
+    "wires": [
+      [
+        "5c3bab0b.a3c454"
+      ]
+    ]
+  },
+  {
+    "id": "5c3bab0b.a3c454",
+    "type": "debug",
+    "name": "",
+    "active": true,
+    "console": "false",
+    "complete": "false",
+    "x": 1062.5,
+    "y": 387.5,
+    "z": "4471196e.bb8ee8",
+    "wires": []
+  },
+  {
+    "id": "ef438690.10bc78",
+    "type": "change",
+    "name": "Ninja Eyes",
+    "rules": [
+      {
+        "t": "set",
+        "p": "payload",
+        "to": "msg.payload.DA"
+      }
+    ],
+    "action": "",
+    "property": "",
+    "from": "",
+    "to": "",
+    "reg": false,
+    "x": 668.7500114440918,
+    "y": 433.75000762939453,
+    "z": "4471196e.bb8ee8",
+    "wires": [
+      [
+        "5c3bab0b.a3c454"
+      ]
+    ]
+  },
+  {
+    "id": "7571be54.8a8e4",
+    "type": "change",
+    "name": "Ninja Status LED",
+    "rules": [
+      {
+        "t": "set",
+        "p": "payload",
+        "to": "msg.payload.DA"
+      }
+    ],
+    "action": "",
+    "property": "",
+    "from": "",
+    "to": "",
+    "reg": false,
+    "x": 686.25,
+    "y": 497.5,
+    "z": "4471196e.bb8ee8",
+    "wires": [
+      [
+        "5c3bab0b.a3c454"
+      ]
+    ]
+  }
+]
