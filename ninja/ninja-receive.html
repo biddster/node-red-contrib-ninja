@@ -47,11 +47,81 @@ THE SOFTWARE.
 </script>
 
 <script type="text/x-red" data-help-name="ninja-receive">
-    <p>A node that parses a JSON response from a Ninja Block.</p>
-    <h2>Description</h2>
-    <p>This is very helpful to read first: <a href="http://shop.ninjablocks.com/blogs/how-to/8589165-communicating-directly-with-the-arduino-in-the-ninja-block">
-    http://shop.ninjablocks.com/blogs/how-to/8589165-communicating-directly-with-the-arduino-in-the-ninja-block</a></p>
-    <h2>Outputs</h2>
-    <p>The value of D will be in msg.topic</p>
-    <p>The value of DA will be in msg.payload</p>
+    <h2 id="receiving-data-from-ninja-sensors-and-433mz-peripherals">Receiving data from Ninja sensors and 433mz peripherals</h2>
+<p>A &#39;serial in&#39; node is wired directly into the Ninja RX node. </p>
+<p><img src="https://github.com/biddster/node-red-contrib-ninja/raw/node-red-contrib-ninja-1/examples/NinjaRX.png" alt="Ninja RX"></p>
+<p>The Ninja RX node understands the JSON payloads that the cloak<br>sends and parses them into a NodeRED message so the data can be acted upon in a NodeRED flow. For example, this output<br>can be wired into a switch node (part of NodeRED) so that action can then be taken depending upon the received data value. </p>
+<p>These are the values that you can expect:</p>
+<table>
+<thead>
+<tr>
+<th>Identifier (D)</th>
+<th>Value (DA)</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>11</td>
+<td>Hex value e.g. 0xc0f33</td>
+<td>The value received by the cloak over 433mhz.</td>
+</tr>
+<tr>
+<td>30</td>
+<td>Floating point</td>
+<td>Humidity value. Received every 30 seconds via the cloak.</td>
+</tr>
+<tr>
+<td>31</td>
+<td>Floating point</td>
+<td>Temperature value. Received every 30 seconds via the cloak.</td>
+</tr>
+<tr>
+<td>999</td>
+<td>Hex colour value</td>
+<td>Current status led colour, received every 30 seconds via the cloak.</td>
+</tr>
+<tr>
+<td>1007</td>
+<td>Hex colour value</td>
+<td>Current eye colour, received every 30 seconds via the cloak.</td>
+</tr>
+</tbody>
+</table>
+<p>For example, the output of the Ninja RX node for temperature would look like this:</p>
+<pre><code>{
+    &quot;topic&quot;: &quot;31::0101::0&quot;,
+    &quot;payload&quot;: {
+        &quot;T&quot;: &quot;DEVICE&quot;,
+        &quot;D&quot;: 31,
+        &quot;DA&quot;: 23.8
+    }
+}
+</code></pre><p>The above message is described here:</p>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>topic</td>
+<td>A composite value of the identifier (D) , the vendor ID (V) and port (G). The format is <code>D::V::G</code>.</td>
+</tr>
+<tr>
+<td>payload.T</td>
+<td>The type of the message, DEVICE</td>
+</tr>
+<tr>
+<td>payload.D</td>
+<td>The identifier, 31 i.e. temperature</td>
+</tr>
+<tr>
+<td>payload.DA</td>
+<td>The value, e.g. 23.8</td>
+</tr>
+</tbody>
+</table>
 </script>

@@ -24,7 +24,7 @@
 
 module.exports = function (RED) {
     'use strict';
-    var _ = require('lodash-node');
+    var _ = require('lodash');
 
     RED.nodes.registerType("ninja-receive", function (config) {
         RED.nodes.createNode(this, config);
@@ -40,7 +40,6 @@ module.exports = function (RED) {
                     raiseError(obj);
                 }
             } catch (error) {
-                node.log(error.stack);
                 node.error(error, msg);
                 node.status({fill: "red", shape: "dot", text: error.message});
             }
