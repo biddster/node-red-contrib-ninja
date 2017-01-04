@@ -27,7 +27,8 @@ THE SOFTWARE.
         category: 'function',
         color: '#FFDF00',
         defaults: {
-            name: {value: ''}
+            name: {value: ''},
+            ignoreErrors: {value: ''}
         },
         inputs: 1,
         outputs: 1,
@@ -44,6 +45,11 @@ THE SOFTWARE.
         <label for="node-input-name"><i class="icon-tag"></i> Name</label>
         <input type="text" id="node-input-name" placeholder="Name">
     </div>
+    <div class="form-row">
+        <label for="node-input-ignoreErrors"><i class="icon-tag"></i> Errors to ignore</label>
+        <input type="text" id="node-input-ignoreErrors" placeholder="Errors e.g. 1 2 32 45">
+    </div>
+
 </script>
 
 <script type="text/x-red" data-help-name="ninja-receive">
@@ -124,4 +130,5 @@ THE SOFTWARE.
 </tr>
 </tbody>
 </table>
+
 </script>
