@@ -83,16 +83,12 @@ module.exports = function (RED) {
 
         function raiseError(obj) {
             if (obj.ERROR) {
-                var errors = _.pluck(obj.ERROR, 'CODE');
-                if (ignoredErrors.length) {
-                    // TODO - check the intersection here so don't assume no error is ignored.
-                    errors = _.difference(errors, ignoredErrors);
-                }
+                var errors = _.map(obj.ERROR, 'CODE');
+                _.pullAll(errors, ignoredErrors);
                 if (errors.length) {
                     throw new Error('Error code: ' + errors.join(','));
-                } else {
-                    node.status({fill: 'yellow', shape: 'dot', text: 'Errors were ignored'});
                 }
+                node.status({fill: 'yellow', shape: 'dot', text: 'Errors were ignored'});
             } else {
                 throw new Error('Unexpected payload: ' + JSON.stringify(obj, null, 0));
             }
