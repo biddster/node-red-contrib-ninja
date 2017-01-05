@@ -47,7 +47,7 @@ THE SOFTWARE.
     </div>
     <div class="form-row">
         <label for="node-input-ignoreErrors"><i class="icon-tag"></i> Errors to ignore</label>
-        <input type="text" id="node-input-ignoreErrors" placeholder="Errors e.g. 1 2 32 45">
+        <input type="text" id="node-input-ignoreErrors" placeholder="E.g. 1 2 32 45">
     </div>
 
 </script>
@@ -130,5 +130,9 @@ THE SOFTWARE.
 </tr>
 </tbody>
 </table>
-
+<h3 id="dealing-with-errors-from-the-ninja-cape">Dealing with Errors from the Ninja Cape</h3>
+<p>Recent reports from users have suggested that the Ninja cape (via the &#39;serial in&#39; node) can report significant volumes of<br>errors via the Ninja RX Node. This has unfortunate side effects such as filling up the NodeRED log and causing crashes etc.</p>
+<p>The Cape provides no other context to help diagnose the cause, you simply see:</p>
+<pre><code>{ &quot;ERROR&quot;: [ { &quot;CODE&quot;: 1 } ] }
+</code></pre><p>The Ninja RX node has the ability to ignore errors. Generally this isn&#39;t a great idea, but in this instance there are<br>limited options. Simply enter the codes you want to ignore into the Ninja RX node configuration in NodeRED.</p>
 </script>
