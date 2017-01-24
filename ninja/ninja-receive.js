@@ -26,66 +26,72 @@ module.exports = function (RED) {
     'use strict';
     var _ = require('lodash');
 
-    RED.nodes.registerType("ninja-receive", function (config) {
+    RED.nodes.registerType('ninja-receive', function (config) {
+
         RED.nodes.createNode(this, config);
-        var node = this;
+        var node = this,
+            ignoredErrors = _.chain(config.ignoreErrors || '').split(/\s+/).compact().map(Number).value();
+
         node.on('input', function (msg) {
             try {
                 var obj = parse(msg);
                 if (obj.ACK) {
-                    send(node, "ACK", obj.ACK);
+                    send(node, 'ACK', obj.ACK);
                 } else if (obj.DEVICE) {
-                    send(node, "DEVICE", obj.DEVICE);
+                    send(node, 'DEVICE', obj.DEVICE);
                 } else {
                     raiseError(obj);
                 }
             } catch (error) {
                 node.error(error, msg);
-                node.status({fill: "red", shape: "dot", text: error.message});
+                node.status({fill: 'red', shape: 'dot', text: error.message});
             }
         });
-    });
 
-    function parse(msg) {
-        // We have to do some repairs to msg.payload as the Ninja sometimes sends a response like this:
-        //     ""{\"ERROR\":[{\"CODE\":2}]}\r\n""
-        // For JSON.parse we have to strip leading and trailing ", remove \r\n and unescape the \".
-        // TODO - can we do this easier using regex?
-        var payload = msg.payload.replace(/\\"/g, '"');
-        var start = 0, end = payload.length - 1;
-        while (payload.charAt(start) !== '{') start++;
-        while (payload.charAt(end) != '}') end--;
-        payload = payload.substring(start, end + 1);
+        function parse(msg) {
+            // We have to do some repairs to msg.payload as the Ninja sometimes sends a response like this:
+            //     ""{\"ERROR\":[{\"CODE\":2}]}\r\n""
+            // For JSON.parse we have to strip leading and trailing ", remove \r\n and unescape the \".
+            // TODO - can we do this easier using regex?
+            var payload = msg.payload.replace(/\\"/g, '"');
+            var start = 0, end = payload.length - 1;
+            while (payload.charAt(start) !== '{') start++;
+            while (payload.charAt(end) !== '}') end--;
+            payload = payload.substring(start, end + 1);
 
-        var obj = JSON.parse(payload);
-        if (_.isString(obj)) {
-            throw new Error('Ninja response parse error. Please report on GitHub along with the payload.');
-        }
-        return obj;
-    }
-
-    function send(node, type, devices) {
-        devices.forEach(function (device) {
-            device.T = type;
-            if (device.D === 11) {
-                // RF (11) values come back as base 2 e.g. 000011000000111100110011
-                device.DA = '0x' + parseInt(device.DA, 2).toString(16);
+            var obj = JSON.parse(payload);
+            if (_.isString(obj)) {
+                throw new Error('Ninja response parse error. Please report on GitHub along with the payload.');
             }
-            node.send({
-                topic: device.D + '::' + device.G + '::' + device.V,
-                payload: device
+            return obj;
+        }
+
+        function send(node, type, devices) {
+            devices.forEach(function (device) {
+                device.T = type;
+                if (device.D === 11) {
+                    // RF (11) values come back as base 2 e.g. 000011000000111100110011
+                    device.DA = '0x' + parseInt(device.DA, 2).toString(16);
+                }
+                node.send({
+                    topic: device.D + '::' + device.G + '::' + device.V,
+                    payload: device
+                });
             });
-        });
-        node.status({fill: "green", shape: "dot", text: "OK"});
-    }
-
-    function raiseError(obj) {
-        var errMsg;
-        if (obj.ERROR) {
-            errMsg = 'Error code: ' + _.pluck(obj.ERROR, 'CODE').join(',');
-        } else {
-            errMsg = 'Unexpected payload: ' + JSON.stringify(obj, null, 0);
+            node.status({fill: 'green', shape: 'dot', text: 'OK'});
         }
-        throw new Error(errMsg);
-    }
+
+        function raiseError(obj) {
+            if (obj.ERROR) {
+                var errors = _.map(obj.ERROR, 'CODE');
+                _.pullAll(errors, ignoredErrors);
+                if (errors.length) {
+                    throw new Error('Error code: ' + errors.join(','));
+                }
+                node.status({fill: 'yellow', shape: 'dot', text: 'Errors were ignored'});
+            } else {
+                throw new Error('Unexpected payload: ' + JSON.stringify(obj, null, 0));
+            }
+        }
+    });
 };
