@@ -117,6 +117,12 @@ describe('Ninja', function () {
             assert.strictEqual(node.error().message, 'Error code: 2');
             assert.strictEqual(node.status().fill, 'red');
         });
+        it('should handle a single ERROR ignore', function () {
+            var node = mock(ninjaReceive, {outputs: 1, ignoreErrors: ' 1'});
+            node.emit('input', {payload: '"{\\\"ERROR\\\":[{\\\"CODE\\\":1}]}\r\n"'});
+            assert.isUndefined(node.error());
+            assert.strictEqual(node.status().fill, 'yellow');
+        });
         it('should handle unexpected JSON', function () {
             var node = mock(ninjaReceive, {outputs: 1});
             node.emit('input', {payload: '"{\\\"UNEXPECTED\\\":[{\\\"CODE\\\":2}]}\r\n"'});
@@ -129,6 +135,13 @@ describe('Ninja', function () {
             node.emit('input', {payload: '"{\\\"ERROR\\\":[{\\\"CODE\\\":1},{\\\"CODE\\\":2},{\\\"CODE\\\":3}]}\r\n"'});
             assert(node.error());
             assert.strictEqual(node.error().message, 'Error code: 1,2,3');
+            assert.strictEqual(node.status().fill, 'red');
+        });
+        it('should handle multiple ERROR ignores', function () {
+            var node = mock(ninjaReceive, {outputs: 1, ignoreErrors: '1  2 '});
+            node.emit('input', {payload: '"{\\\"ERROR\\\":[{\\\"CODE\\\":1},{\\\"CODE\\\":2},{\\\"CODE\\\":3}]}\r\n"'});
+            assert(node.error());
+            assert.strictEqual(node.error().message, 'Error code: 3');
             assert.strictEqual(node.status().fill, 'red');
         });
         it('should parse temp as a floating point', function () {

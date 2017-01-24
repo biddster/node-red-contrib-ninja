@@ -89,6 +89,19 @@ The above message is described here:
 |  payload.DA | The value, e.g. 23.8  |
 
 
+### Dealing with Errors from the Ninja Cape
+
+Recent reports from users have suggested that the Ninja cape (via the 'serial in' node) can report significant volumes of
+errors via the Ninja RX Node. This has unfortunate side effects such as filling up the NodeRED log and causing crashes etc.
+
+The Cape provides no other context to help diagnose the cause, you simply see:
+ 
+    { "ERROR": [ { "CODE": 1 } ] }
+
+The Ninja RX node has the ability to ignore errors. Generally this isn't a great idea, but in this instance there are
+limited options. Simply enter the codes you want to ignore into the Ninja RX node configuration in NodeRED.
+
+
 ## Sending data to Ninja sensors and 433mz peripherals
 
 A 'serial out' node is wired into the output of the Ninja TX node. 
