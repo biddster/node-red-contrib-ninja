@@ -1,6 +1,6 @@
 {
   "name": "node-red-contrib-ninja",
-    "version": "1.2.0-d",
+    "version": "1.2.1",
   "description": "Node-red nodes that allow one to communicate with a Ninja Block.",
   "repository": "https://github.com/biddster/node-red-contrib-ninja",
   "bugs": {
