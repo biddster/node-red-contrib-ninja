@@ -23,29 +23,13 @@
  */
 
 module.exports = function (RED) {
-    'use strict';
+    const _ = require('lodash');
 
-    RED.nodes.registerType("ninja-send", function (config) {
-        RED.nodes.createNode(this, config);
-        var node = this;
-        node.on('input', function (msg) {
-            try {
-                var d = prepareD(msg.topic || config.d);
-                var da = prepareDA(d, msg.payload || config.da);
-                msg.payload = JSON.stringify({"DEVICE": [{"G": "0", "V": 0, "D": d, "DA": da}]}, null, 0) + '\r\n';
-                node.send(msg);
-                node.status({fill: "green", shape: "dot", text: "OK"});
-            } catch (error) {
-                node.error(error, msg);
-                node.status({fill: "red", shape: "dot", text: error.message});
-            }
-        });
-    });
-
-    function prepareD(d) {
+    const prepareD = function (d) {
         if (!d) {
             throw new Error('No D value');
         }
+
         switch (d.toLowerCase()) {
             case 'rf':
                 return 11;
@@ -56,18 +40,16 @@ module.exports = function (RED) {
             default:
                 return parseInt(d);
         }
-    }
+    };
 
-    function prepareDA(d, da) {
+    const prepareDA = function (d, da) {
         if (!da) {
             throw new Error('No DA value');
         }
+
         switch (d) {
             case 11:
-                da = parseInt(da).toString(2);
-                while (da.length < 24) {
-                    da = '0' + da;
-                }
+                da = _.padStart(parseInt(da).toString(2), 24, '0');
                 break;
             case 30:
                 throw new Error('Cannot make a send request for Humidity');
@@ -76,6 +58,28 @@ module.exports = function (RED) {
             default:
                 break;
         }
+
         return da;
-    }
+    };
+
+    RED.nodes.registerType('ninja-send', function (config) {
+        RED.nodes.createNode(this, config);
+
+        // eslint-disable-next-line consistent-this
+        const node = this;
+        node.on('input', (msg) => {
+            try {
+                const d = prepareD(msg.topic || config.d);
+                const da = prepareDA(d, msg.payload || config.da);
+                msg.payload =
+                    JSON.stringify({ DEVICE: [{ G: '0', V: 0, D: d, DA: da }] }, null, 0) +
+                    '\r\n';
+                node.send(msg);
+                node.status({ fill: 'green', shape: 'dot', text: 'OK' });
+            } catch (error) {
+                node.error(error, msg);
+                node.status({ fill: 'red', shape: 'dot', text: error.message });
+            }
+        });
+    });
 };
