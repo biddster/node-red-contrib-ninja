@@ -1,38 +1,93 @@
 {
-  "name": "node-red-contrib-ninja",
-    "version": "1.2.1",
-  "description": "Node-red nodes that allow one to communicate with a Ninja Block.",
-  "repository": "https://github.com/biddster/node-red-contrib-ninja",
-  "bugs": {
-    "url": "https://github.com/biddster/node-red-contrib-ninja/issues"
-  },
-  "main": "",
-  "directories": {
-    "test": "tests"
-  },
-  "scripts": {
-    "test": "node_modules/.bin/mocha tests/test.js"
-  },
-  "author": "@biddster",
-  "license": "MIT",
-  "devDependencies": {
-    "chai": "^3.0.0",
-    "markdown-to-html": "0.0.13",
-    "mocha": "^3.1.2",
-    "node-red-contrib-mock-node": "^0.2.0"
-  },
-  "keywords": [
-    "node-red",
-    "ninja",
-    "ninja block"
-  ],
-  "node-red": {
-    "nodes": {
-      "ninja-send": "ninja/ninja-send.js",
-      "ninja-receive": "ninja/ninja-receive.js"
+    "name": "node-red-contrib-ninja",
+    "version": "1.2.2",
+    "description": "Node-red nodes that allow one to communicate with a Ninja Block.",
+    "repository": "https://github.com/biddster/node-red-contrib-ninja",
+    "bugs": {
+        "url": "https://github.com/biddster/node-red-contrib-ninja/issues"
+    },
+    "main": "",
+    "directories": {
+        "test": "tests"
+    },
+    "scripts": {
+        "test": "node_modules/.bin/mocha tests/test.js",
+        "update-dependencies": "./node_modules/.bin/ncu -u && npm install",
+        "lint": "eslint ."
+    },
+    "author": "@biddster",
+    "license": "MIT",
+    "devDependencies": {
+        "@hapi/eslint-config-hapi": "13.0.2",
+        "@hapi/eslint-plugin-hapi": "4.3.6",
+        "babel-eslint": "10.1.0",
+        "chai": "^4.3.4",
+        "eslint": "^7.23.0",
+        "husky": "^6.0.0",
+        "lint-staged": "^10.5.4",
+        "markdown-to-html": "0.0.13",
+        "mocha": "^8.3.2",
+        "node-red-contrib-mock-node": "^0.5.0",
+        "npm-check-updates": "^11.3.0",
+        "prettier": "^2.2.1"
+    },
+    "keywords": [
+        "node-red",
+        "ninja",
+        "ninja block"
+    ],
+    "node-red": {
+        "nodes": {
+            "ninja-send": "ninja/ninja-send.js",
+            "ninja-receive": "ninja/ninja-receive.js"
+        }
+    },
+    "dependencies": {
+        "lodash": "^4.17.21"
+    },
+    "husky": {
+        "hooks": {
+            "pre-commit": "lint-staged"
+        }
+    },
+    "eslintConfig": {
+        "extends": "@hapi/eslint-config-hapi",
+        "parser": "babel-eslint",
+        "parserOptions": {
+            "ecmaVersion": 2020,
+            "sourceType": "script"
+        },
+        "overrides": [
+            {
+                "files": [
+                    "*.js"
+                ],
+                "rules": {
+                    "@hapi/hapi/scope-start": "off",
+                    "comma-dangle": "off",
+                    "brace-style": "off",
+                    "strict": "off"
+                }
+            }
+        ]
+    },
+    "prettier": {
+        "singleQuote": true,
+        "tabWidth": 4,
+        "printWidth": 96
+    },
+    "nyc": {
+        "exclude": "tests/**"
+    },
+    "lint-staged": {
+        "*.js": [
+            "prettier --write",
+            "eslint",
+            "git add"
+        ],
+        "*.{md,html,json}": [
+            "prettier --write",
+            "git add"
+        ]
     }
-  },
-  "dependencies": {
-    "lodash": "^4.17.4"
-  }
 }
