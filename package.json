@@ -22,14 +22,15 @@
         "@hapi/eslint-plugin-hapi": "4.3.6",
         "babel-eslint": "10.1.0",
         "chai": "^4.3.4",
-        "eslint": "^7.23.0",
+        "eslint": "^7.27.0",
         "husky": "^6.0.0",
-        "lint-staged": "^10.5.4",
+        "lint-staged": "^11.0.0",
         "markdown-to-html": "0.0.13",
-        "mocha": "^8.3.2",
-        "node-red-contrib-mock-node": "^0.5.0",
-        "npm-check-updates": "^11.3.0",
-        "prettier": "^2.2.1"
+        "mocha": "^8.4.0",
+        "node-red-contrib-mock-node": "^0.5.1",
+        "npm-check-updates": "^11.6.0",
+        "prettier": "^2.3.0",
+        "release-it": "^14.7.0"
     },
     "keywords": [
         "node-red",
